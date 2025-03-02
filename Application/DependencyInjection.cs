@@ -3,6 +3,8 @@ using Application.Services;
 using Application.UseCases;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using BGarden.Application.Interfaces;
+using BGarden.Application.Services;
 
 namespace Application
 {
@@ -17,6 +19,7 @@ namespace Application
             services.AddScoped<IBiometryService, BiometryService>();
             services.AddScoped<IPhenologyService, PhenologyService>();
             services.AddScoped<IRegionService, RegionService>();
+            services.AddScoped<IUserService, UserService>();
             
             // Регистрируем UseCase'ы
             services.AddScoped<CreateSpecimenUseCase>();

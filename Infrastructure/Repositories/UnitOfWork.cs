@@ -14,6 +14,7 @@ namespace BGarden.Infrastructure.Repositories
         private readonly IBiometryRepository _biometryRepository;
         private readonly IPhenologyRepository _phenologyRepository;
         private readonly IRegionRepository _regionRepository;
+        private readonly IUserRepository _userRepository;
         private bool _disposed = false;
 
         public UnitOfWork(
@@ -23,7 +24,8 @@ namespace BGarden.Infrastructure.Repositories
             IExpositionRepository expositionRepository,
             IBiometryRepository biometryRepository,
             IPhenologyRepository phenologyRepository,
-            IRegionRepository regionRepository)
+            IRegionRepository regionRepository,
+            IUserRepository userRepository)
         {
             _context = context;
             _specimenRepository = specimenRepository;
@@ -32,6 +34,7 @@ namespace BGarden.Infrastructure.Repositories
             _biometryRepository = biometryRepository;
             _phenologyRepository = phenologyRepository;
             _regionRepository = regionRepository;
+            _userRepository = userRepository;
         }
 
         public ISpecimenRepository Specimens => _specimenRepository;
@@ -40,6 +43,7 @@ namespace BGarden.Infrastructure.Repositories
         public IBiometryRepository Biometries => _biometryRepository;
         public IPhenologyRepository Phenologies => _phenologyRepository;
         public IRegionRepository Regions => _regionRepository;
+        public IUserRepository Users => _userRepository;
 
         public async Task<int> SaveChangesAsync()
         {

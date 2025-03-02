@@ -15,6 +15,7 @@ namespace BGarden.Domain.Interfaces
         IBiometryRepository Biometries { get; }
         IPhenologyRepository Phenologies { get; }
         IRegionRepository Regions { get; }
+        IUserRepository Users { get; }
 
         // Здесь можно добавить другие репозитории по мере необходимости
         // IFamilyRepository Families { get; }

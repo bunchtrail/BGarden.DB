@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using BGarden.Domain.Interfaces;
 using BGarden.Infrastructure.Data;
 using BGarden.Infrastructure.Repositories;
+using BGarden.Infrastructure.Services;
 
 namespace BGarden.Infrastructure
 {
@@ -24,9 +25,13 @@ namespace BGarden.Infrastructure
             services.AddScoped<IBiometryRepository, BiometryRepository>();
             services.AddScoped<IPhenologyRepository, PhenologyRepository>();
             services.AddScoped<IRegionRepository, RegionRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
 
             // Регистрируем UnitOfWork
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            
+            // Регистрируем сервисы
+            services.AddScoped<IAuthService, AuthService>();
 
             return services;
         }

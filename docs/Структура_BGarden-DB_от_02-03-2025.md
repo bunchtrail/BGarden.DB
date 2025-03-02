@@ -3,7 +3,7 @@
   - **Application**
     - `Application.csproj` (596.0 B)
     - **bin**
-    - `DependencyInjection.cs` (1.1 KB)
+    - `DependencyInjection.cs` (1.2 KB)
     - **DTO**
       - `BiometryDto.cs` (1.2 KB)
       - `ExpositionDto.cs` (788.0 B)
@@ -11,6 +11,7 @@
       - `PhenologyDto.cs` (1.4 KB)
       - `RegionDto.cs` (2.0 KB)
       - `SpecimenDto.cs` (2.6 KB)
+      - `UserDto.cs` (4.9 KB)
     - **Interfaces**
       - `IBiometryService.cs` (2.3 KB)
       - `IExpositionService.cs` (1.5 KB)
@@ -18,6 +19,7 @@
       - `IPhenologyService.cs` (2.6 KB)
       - `IRegionService.cs` (2.3 KB)
       - `ISpecimenService.cs` (1.3 KB)
+      - `IUserService.cs` (2.0 KB)
     - **Mappers**
       - `BiometryMapper.cs` (1.9 KB)
       - `ExpositionMapper.cs` (1.5 KB)
@@ -25,6 +27,7 @@
       - `PhenologyMapper.cs` (2.1 KB)
       - `RegionMapper.cs` (2.8 KB)
       - `SpecimenMapper.cs` (6.4 KB)
+      - `UserMapper.cs` (2.3 KB)
     - **obj**
     - **Services**
       - `BiometryService.cs` (3.0 KB)
@@ -33,11 +36,12 @@
       - `PhenologyService.cs` (3.3 KB)
       - `RegionService.cs` (3.8 KB)
       - `SpecimenService.cs` (2.7 KB)
+      - `UserService.cs` (6.4 KB)
     - **UseCases**
       - `CreateSpecimenUseCase.cs` (2.2 KB)
   - `BGarden.DB.sln` (2.4 KB)
   - **docs**
-    - `Структура_BGarden-DB_от_02-03-2025.md` (3.6 KB)
+    - `Структура_BGarden-DB_от_02-03-2025.md` (3.9 KB)
   - **Domain**
     - **bin**
     - `Domain.csproj` (320.0 B)
@@ -61,7 +65,8 @@
       - `IRegionRepository.cs` (1.5 KB)
       - `IRepository.cs` (584.0 B)
       - `ISpecimenRepository.cs` (1014.0 B)
-      - `IUnitOfWork.cs` (922.0 B)
+      - `IUnitOfWork.cs` (962.0 B)
+      - `IUserRepository.cs` (1.2 KB)
     - **obj**
     - **Services**
     - **ValueObjects**
@@ -81,7 +86,7 @@
       - `ConnectionString.cs` (225.0 B)
       - `DesignTimeDbContextFactory.cs` (541.0 B)
       - **Migrations**
-    - `DependencyInjection.cs` (1.4 KB)
+    - `DependencyInjection.cs` (1.7 KB)
     - `Infrastructure.csproj` (1.5 KB)
     - **Migrations**
       - `20250302162821_init.cs` (9.6 KB)
@@ -105,6 +110,7 @@
       - `RegionRepository.cs` (6.3 KB)
       - `RepositoryBase.cs` (1.3 KB)
       - `SpecimenRepository.cs` (1.8 KB)
-      - `UnitOfWork.cs` (2.4 KB)
+      - `UnitOfWork.cs` (2.6 KB)
+      - `UserRepository.cs` (1.9 KB)
     - **Services**
       - `AuthService.cs` (7.5 KB)
