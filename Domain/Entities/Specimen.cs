@@ -1,4 +1,5 @@
 using NetTopologySuite.Geometries;
+using System;
 
 namespace BGarden.Domain.Entities
 {
@@ -170,6 +171,26 @@ namespace BGarden.Domain.Entities
         /// Кто заполнил запись, ФИО, должность и т.п.
         /// </summary>
         public string? FilledBy { get; set; }
+
+        /// <summary>
+        /// Идентификатор пользователя, который создал/отредактировал запись
+        /// </summary>
+        public int? CreatedByUserId { get; set; }
+        
+        /// <summary>
+        /// Пользователь, который создал/отредактировал запись
+        /// </summary>
+        public User? CreatedByUser { get; set; }
+
+        /// <summary>
+        /// Дата создания записи
+        /// </summary>
+        public DateTime CreatedAt { get; set; }
+        
+        /// <summary>
+        /// Дата последнего обновления записи
+        /// </summary>
+        public DateTime? LastUpdatedAt { get; set; }
 
         // Навигационные свойства для связи «один ко многим» со сторонними таблицами:
         public ICollection<Phenology>? Phenologies { get; set; }

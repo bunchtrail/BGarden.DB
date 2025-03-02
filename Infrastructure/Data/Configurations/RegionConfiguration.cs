@@ -39,29 +39,27 @@ namespace BGarden.Infrastructure.Data.Configurations
                    .HasColumnType("decimal(9,6)")
                    .IsRequired();
 
-            // Настройка пространственного поля Location
-            builder.Property(r => r.Location)
-                   .HasColumnType("geography (point)");
+            // Игнорируем пространственное поле Location в базе данных
+            builder.Ignore(r => r.Location);
 
             // Индекс для ускорения поиска по координатам
             builder.HasIndex(r => new { r.Latitude, r.Longitude })
                    .HasDatabaseName("IX_Region_Coordinates");
 
-            // Пространственный индекс для поля Location
-            builder.HasIndex(r => r.Location)
-                   .HasMethod("SPATIAL")
-                   .HasDatabaseName("IX_Region_Location_Spatial");
+            // Убираем пространственный индекс для поля Location
+            // builder.HasIndex(r => r.Location)
+            //        .HasMethod("SPATIAL")
+            //        .HasDatabaseName("IX_Region_Location_Spatial");
 
             // Необязательные поля
             builder.Property(r => r.Radius)
                    .HasColumnType("decimal(9,2)");
 
             builder.Property(r => r.BoundaryWkt)
-                   .HasColumnType("nvarchar(max)");
+                   .HasColumnType("text");
 
-            // Настройка пространственного поля Boundary
-            builder.Property(r => r.Boundary)
-                   .HasColumnType("geography (polygon)");
+            // Игнорируем поле Boundary в базе данных
+            builder.Ignore(r => r.Boundary);
 
             // Связь с Specimen - одна область может содержать много растений
             builder.HasMany(r => r.Specimens)

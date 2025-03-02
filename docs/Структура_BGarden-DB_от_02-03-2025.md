@@ -31,13 +31,13 @@
       - `ExpositionService.cs` (2.4 KB)
       - `FamilyService.cs` (2.3 KB)
       - `PhenologyService.cs` (3.3 KB)
-      - `RegionService.cs` (3.9 KB)
+      - `RegionService.cs` (3.8 KB)
       - `SpecimenService.cs` (2.7 KB)
     - **UseCases**
       - `CreateSpecimenUseCase.cs` (2.2 KB)
-  - `BGarden.DB.sln` (1.9 KB)
+  - `BGarden.DB.sln` (2.4 KB)
   - **docs**
-    - `Структура_BGarden-DB_от_02-03-2025.md` (3.4 KB)
+    - `Структура_BGarden-DB_от_02-03-2025.md` (3.6 KB)
   - **Domain**
     - **bin**
     - `Domain.csproj` (320.0 B)
@@ -47,10 +47,13 @@
       - `Family.cs` (744.0 B)
       - `Phenology.cs` (1.5 KB)
       - `Region.cs` (2.5 KB)
-      - `Specimen.cs` (6.5 KB)
+      - `Specimen.cs` (7.2 KB)
+      - `User.cs` (2.5 KB)
     - **Enums**
       - `SectorType.cs` (251.0 B)
+      - `UserRole.cs` (728.0 B)
     - **Interfaces**
+      - `IAuthService.cs` (1.5 KB)
       - `IBiometryRepository.cs` (692.0 B)
       - `IExpositionRepository.cs` (517.0 B)
       - `IFamilyRepository.cs` (512.0 B)
@@ -72,8 +75,9 @@
         - `ExpositionConfiguration.cs` (872.0 B)
         - `FamilyConfiguration.cs` (868.0 B)
         - `PhenologyConfiguration.cs` (917.0 B)
-        - `RegionConfiguration.cs` (2.8 KB)
-        - `SpecimenConfiguration.cs` (4.8 KB)
+        - `RegionConfiguration.cs` (2.7 KB)
+        - `SpecimenConfiguration.cs` (5.4 KB)
+        - `UserConfiguration.cs` (2.3 KB)
       - `ConnectionString.cs` (225.0 B)
       - `DesignTimeDbContextFactory.cs` (541.0 B)
       - **Migrations**
@@ -86,7 +90,9 @@
       - `20250302164623_v1.Designer.cs` (11.3 KB)
       - `20250302181406_AddSectorTypeToSpecimen.cs` (804.0 B)
       - `20250302181406_AddSectorTypeToSpecimen.Designer.cs` (11.4 KB)
-      - `BotanicalContextModelSnapshot.cs` (11.3 KB)
+      - `20250302191400_v2.cs` (7.7 KB)
+      - `20250302191400_v2.Designer.cs` (16.9 KB)
+      - `BotanicalContextModelSnapshot.cs` (16.8 KB)
       - `README.md` (1.6 KB)
     - **obj**
     - `Program.cs` (711.0 B)
@@ -101,3 +107,4 @@
       - `SpecimenRepository.cs` (1.8 KB)
       - `UnitOfWork.cs` (2.4 KB)
     - **Services**
+      - `AuthService.cs` (7.5 KB)

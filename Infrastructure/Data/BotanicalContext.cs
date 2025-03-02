@@ -19,6 +19,7 @@ namespace BGarden.Infrastructure.Data
         public DbSet<Phenology> Phenologies { get; set; } = null!;
         public DbSet<Biometry> Biometries { get; set; } = null!;
         public DbSet<Region> Regions { get; set; } = null!;
+        public DbSet<User> Users { get; set; } = null!;
 
         // Переопределим OnModelCreating, чтобы применить конфигурации
         protected override void OnModelCreating(ModelBuilder modelBuilder)

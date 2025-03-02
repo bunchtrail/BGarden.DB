@@ -28,19 +28,20 @@ namespace BGarden.Infrastructure.Data.Configurations
             builder.Property(s => s.Longitude)
                    .HasColumnType("decimal(9,6)");
 
-            // Настройка пространственного поля Location
-            builder.Property(s => s.Location)
-                   .HasColumnType("geography (point)"); // Вместо HasSrid(4326)
+            // Игнорируем пространственное поле Location в базе данных
+            builder.Ignore(s => s.Location);
 
-            // Индекс для ускорения поиска по координатам
+            // Индекс для ускорения поиска по координатам (без фильтра, который создает проблемы)
             builder.HasIndex(s => new { s.Latitude, s.Longitude })
-                   .HasDatabaseName("IX_Specimen_Coordinates")
-                   .HasFilter("[Latitude] IS NOT NULL AND [Longitude] IS NOT NULL"); // Индекс только для записей с координатами
+                   .HasDatabaseName("IX_Specimen_Coordinates");
+            
+            // Убираем фильтр, который вызывает проблемы в PostgreSQL
+            // .HasFilter("[Latitude] IS NOT NULL AND [Longitude] IS NOT NULL");
 
-            // Пространственный индекс для поля Location
-            builder.HasIndex(s => s.Location)
-                   .HasMethod("SPATIAL")
-                   .HasDatabaseName("IX_Specimen_Location_Spatial");
+            // Убираем пространственный индекс для поля Location
+            // builder.HasIndex(s => s.Location)
+            //        .HasMethod("SPATIAL")
+            //        .HasDatabaseName("IX_Specimen_Location_Spatial");
 
             // Связь с Region (Many-to-One)
             builder.HasOne(s => s.Region)
@@ -120,6 +121,18 @@ namespace BGarden.Infrastructure.Data.Configurations
                    .WithMany(e => e.Specimens)
                    .HasForeignKey(s => s.ExpositionId)
                    .OnDelete(DeleteBehavior.SetNull);
+
+            // Связь с User (Many-to-One)
+            builder.HasOne(s => s.CreatedByUser)
+                   .WithMany(u => u.ManagedSpecimens)
+                   .HasForeignKey(s => s.CreatedByUserId)
+                   .OnDelete(DeleteBehavior.SetNull);
+
+            // Настройки для полей даты создания и обновления
+            builder.Property(s => s.CreatedAt)
+                   .IsRequired();
+                   
+            builder.Property(s => s.LastUpdatedAt);
 
             // Связь с Phenology/ Biometry задается со стороны PhenologyConfiguration / BiometryConfiguration,
             // но можно и здесь, если хотим уточнить.

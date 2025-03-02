@@ -26,14 +26,14 @@ namespace Application.Services
         /// <inheritdoc/>
         public async Task<IEnumerable<RegionDto>> GetAllRegionsAsync()
         {
-            var regions = await _unitOfWork.RegionRepository.GetAllRegionsAsync();
+            var regions = await _unitOfWork.Regions.GetAllRegionsAsync();
             return regions.ToDto();
         }
 
         /// <inheritdoc/>
         public async Task<RegionDto?> GetRegionByIdAsync(int id)
         {
-            var region = await _unitOfWork.RegionRepository.GetRegionByIdAsync(id);
+            var region = await _unitOfWork.Regions.GetRegionByIdAsync(id);
             return region?.ToDto();
         }
 
@@ -42,7 +42,7 @@ namespace Application.Services
         {
             var region = regionDto.ToEntity();
             
-            await _unitOfWork.RegionRepository.AddAsync(region);
+            await _unitOfWork.Regions.AddAsync(region);
             await _unitOfWork.SaveChangesAsync();
             
             return region.ToDto();
@@ -51,13 +51,13 @@ namespace Application.Services
         /// <inheritdoc/>
         public async Task<RegionDto?> UpdateRegionAsync(int id, RegionDto regionDto)
         {
-            var existingRegion = await _unitOfWork.RegionRepository.GetRegionByIdAsync(id);
+            var existingRegion = await _unitOfWork.Regions.GetRegionByIdAsync(id);
             if (existingRegion == null)
                 return null;
 
             existingRegion.UpdateFromDto(regionDto);
             
-            await _unitOfWork.RegionRepository.UpdateAsync(existingRegion);
+            _unitOfWork.Regions.Update(existingRegion);
             await _unitOfWork.SaveChangesAsync();
             
             return existingRegion.ToDto();
@@ -66,11 +66,11 @@ namespace Application.Services
         /// <inheritdoc/>
         public async Task<bool> DeleteRegionAsync(int id)
         {
-            var region = await _unitOfWork.RegionRepository.GetRegionByIdAsync(id);
+            var region = await _unitOfWork.Regions.GetRegionByIdAsync(id);
             if (region == null)
                 return false;
 
-            await _unitOfWork.RegionRepository.DeleteAsync(region);
+            _unitOfWork.Regions.Remove(region);
             await _unitOfWork.SaveChangesAsync();
             
             return true;
@@ -79,12 +79,12 @@ namespace Application.Services
         /// <inheritdoc/>
         public async Task<IEnumerable<SpecimenDto>> GetSpecimensInRegionAsync(int regionId)
         {
-            var region = await _unitOfWork.RegionRepository.GetRegionByIdAsync(regionId);
+            var region = await _unitOfWork.Regions.GetRegionByIdAsync(regionId);
             if (region == null)
                 return Enumerable.Empty<SpecimenDto>();
 
             // Получаем образцы из данного региона через репозиторий Specimen
-            var specimens = await _unitOfWork.SpecimenRepository.GetSpecimensByRegionIdAsync(regionId);
+            var specimens = await _unitOfWork.Specimens.GetSpecimensByRegionIdAsync(regionId);
             return specimens.Select(s => s.ToDto());
         }
 
