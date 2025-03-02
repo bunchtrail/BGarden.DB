@@ -1,3 +1,5 @@
+using NetTopologySuite.Geometries;
+
 namespace BGarden.Domain.Entities
 {
     /// <summary>
@@ -19,6 +21,31 @@ namespace BGarden.Domain.Entities
         /// Тип сектора, в котором находится образец.
         /// </summary>
         public BGarden.Domain.Enums.SectorType SectorType { get; set; }
+
+        /// <summary>
+        /// Координаты местоположения растения (широта).
+        /// </summary>
+        public decimal? Latitude { get; set; }
+
+        /// <summary>
+        /// Координаты местоположения растения (долгота).
+        /// </summary>
+        public decimal? Longitude { get; set; }
+
+        /// <summary>
+        /// Геометрическая точка, представляющая местоположение растения
+        /// </summary>
+        public Point? Location { get; set; }
+
+        /// <summary>
+        /// Идентификатор области, в которой находится растение.
+        /// </summary>
+        public int? RegionId { get; set; }
+        
+        /// <summary>
+        /// Область, в которой находится растение.
+        /// </summary>
+        public Region? Region { get; set; }
 
         /// <summary>
         /// Семейство (ссылка на сущность Family).

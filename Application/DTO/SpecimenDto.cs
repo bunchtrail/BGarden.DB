@@ -10,6 +10,26 @@ namespace Application.DTO
         public string InventoryNumber { get; set; } = null!;
 
         public BGarden.Domain.Enums.SectorType SectorType { get; set; }
+        
+        /// <summary>
+        /// Координаты местоположения растения (широта)
+        /// </summary>
+        public decimal? Latitude { get; set; }
+
+        /// <summary>
+        /// Координаты местоположения растения (долгота)
+        /// </summary>
+        public decimal? Longitude { get; set; }
+
+        /// <summary>
+        /// Идентификатор области (региона), в которой находится растение
+        /// </summary>
+        public int? RegionId { get; set; }
+        
+        /// <summary>
+        /// Название области (региона), в которой находится растение
+        /// </summary>
+        public string? RegionName { get; set; }
 
         public int FamilyId { get; set; }
         public string? FamilyName { get; set; }  // Чтобы не тянуть всю сущность Family

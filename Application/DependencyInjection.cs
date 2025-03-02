@@ -16,6 +16,7 @@ namespace Application
             services.AddScoped<IExpositionService, ExpositionService>();
             services.AddScoped<IBiometryService, BiometryService>();
             services.AddScoped<IPhenologyService, PhenologyService>();
+            services.AddScoped<IRegionService, RegionService>();
             
             // Регистрируем UseCase'ы
             services.AddScoped<CreateSpecimenUseCase>();

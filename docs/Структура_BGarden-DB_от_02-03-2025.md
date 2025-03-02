@@ -1,42 +1,37 @@
 - **BGarden.DB**
   - **.vs**
-  - **Api**
-    - `Api.csproj` (436.0 B)
-    - `Api.http` (119.0 B)
-    - `appsettings.Development.json` (127.0 B)
-    - `appsettings.json` (151.0 B)
-    - **obj**
-    - `Program.cs` (1.0 KB)
-    - **Properties**
-      - `launchSettings.json` (644.0 B)
   - **Application**
     - `Application.csproj` (596.0 B)
     - **bin**
-    - `DependencyInjection.cs` (1.0 KB)
+    - `DependencyInjection.cs` (1.1 KB)
     - **DTO**
       - `BiometryDto.cs` (1.2 KB)
       - `ExpositionDto.cs` (788.0 B)
       - `FamilyDto.cs` (792.0 B)
       - `PhenologyDto.cs` (1.4 KB)
-      - `SpecimenDto.cs` (1.8 KB)
+      - `RegionDto.cs` (2.0 KB)
+      - `SpecimenDto.cs` (2.6 KB)
     - **Interfaces**
       - `IBiometryService.cs` (2.3 KB)
       - `IExpositionService.cs` (1.5 KB)
       - `IFamilyService.cs` (1.5 KB)
       - `IPhenologyService.cs` (2.6 KB)
+      - `IRegionService.cs` (2.4 KB)
       - `ISpecimenService.cs` (1.3 KB)
     - **Mappers**
       - `BiometryMapper.cs` (1.9 KB)
       - `ExpositionMapper.cs` (1.5 KB)
       - `FamilyMapper.cs` (1.4 KB)
       - `PhenologyMapper.cs` (2.1 KB)
-      - `SpecimenMapper.cs` (2.6 KB)
+      - `RegionMapper.cs` (4.0 KB)
+      - `SpecimenMapper.cs` (6.4 KB)
     - **obj**
     - **Services**
       - `BiometryService.cs` (3.0 KB)
       - `ExpositionService.cs` (2.4 KB)
       - `FamilyService.cs` (2.3 KB)
       - `PhenologyService.cs` (3.3 KB)
+      - `RegionService.cs` (3.9 KB)
       - `SpecimenService.cs` (2.7 KB)
     - **UseCases**
       - `CreateSpecimenUseCase.cs` (2.2 KB)
@@ -45,13 +40,14 @@
     - `Структура_BGarden-DB_от_02-03-2025.md` (3.4 KB)
   - **Domain**
     - **bin**
-    - `Domain.csproj` (218.0 B)
+    - `Domain.csproj` (320.0 B)
     - **Entities**
       - `Biometry.cs` (1.4 KB)
       - `Exposition.cs` (936.0 B)
       - `Family.cs` (744.0 B)
       - `Phenology.cs` (1.5 KB)
-      - `Specimen.cs` (5.6 KB)
+      - `Region.cs` (2.5 KB)
+      - `Specimen.cs` (6.5 KB)
     - **Enums**
       - `SectorType.cs` (251.0 B)
     - **Interfaces**
@@ -59,9 +55,10 @@
       - `IExpositionRepository.cs` (517.0 B)
       - `IFamilyRepository.cs` (512.0 B)
       - `IPhenologyRepository.cs` (751.0 B)
+      - `IRegionRepository.cs` (1.5 KB)
       - `IRepository.cs` (584.0 B)
       - `ISpecimenRepository.cs` (530.0 B)
-      - `IUnitOfWork.cs` (878.0 B)
+      - `IUnitOfWork.cs` (922.0 B)
     - **obj**
     - **Services**
     - **ValueObjects**
@@ -69,18 +66,19 @@
   - **Infrastructure**
     - **bin**
     - **Data**
-      - `BotanicalContext.cs` (1.5 KB)
+      - `BotanicalContext.cs` (1.6 KB)
       - **Configurations**
         - `BiometryConfiguration.cs` (738.0 B)
         - `ExpositionConfiguration.cs` (872.0 B)
         - `FamilyConfiguration.cs` (868.0 B)
         - `PhenologyConfiguration.cs` (917.0 B)
-        - `SpecimenConfiguration.cs` (3.5 KB)
+        - `RegionConfiguration.cs` (2.8 KB)
+        - `SpecimenConfiguration.cs` (4.8 KB)
       - `ConnectionString.cs` (225.0 B)
       - `DesignTimeDbContextFactory.cs` (541.0 B)
       - **Migrations**
     - `DependencyInjection.cs` (1.4 KB)
-    - `Infrastructure.csproj` (1.3 KB)
+    - `Infrastructure.csproj` (1.5 KB)
     - **Migrations**
       - `20250302162821_init.cs` (9.6 KB)
       - `20250302162821_init.Designer.cs` (11.1 KB)
@@ -98,7 +96,8 @@
       - `FamilyRepository.cs` (852.0 B)
       - `PhenologyRepository.cs` (1.9 KB)
       - `README.md` (2.9 KB)
+      - `RegionRepository.cs` (6.3 KB)
       - `RepositoryBase.cs` (1.3 KB)
       - `SpecimenRepository.cs` (1.5 KB)
-      - `UnitOfWork.cs` (2.2 KB)
+      - `UnitOfWork.cs` (2.4 KB)
     - **Services**

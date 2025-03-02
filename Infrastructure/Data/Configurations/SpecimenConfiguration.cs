@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using BGarden.Domain.Entities;
 using BGarden.Domain.Enums;
+using NetTopologySuite.Geometries;
 
 namespace BGarden.Infrastructure.Data.Configurations
 {
@@ -19,6 +20,33 @@ namespace BGarden.Infrastructure.Data.Configurations
             builder.Property(s => s.SectorType)
                    .HasConversion<int>()
                    .IsRequired();
+
+            // Координаты местоположения растения
+            builder.Property(s => s.Latitude)
+                   .HasColumnType("decimal(9,6)");
+
+            builder.Property(s => s.Longitude)
+                   .HasColumnType("decimal(9,6)");
+
+            // Настройка пространственного поля Location
+            builder.Property(s => s.Location)
+                   .HasColumnType("geography (point)"); // Вместо HasSrid(4326)
+
+            // Индекс для ускорения поиска по координатам
+            builder.HasIndex(s => new { s.Latitude, s.Longitude })
+                   .HasDatabaseName("IX_Specimen_Coordinates")
+                   .HasFilter("[Latitude] IS NOT NULL AND [Longitude] IS NOT NULL"); // Индекс только для записей с координатами
+
+            // Пространственный индекс для поля Location
+            builder.HasIndex(s => s.Location)
+                   .HasMethod("SPATIAL")
+                   .HasDatabaseName("IX_Specimen_Location_Spatial");
+
+            // Связь с Region (Many-to-One)
+            builder.HasOne(s => s.Region)
+                   .WithMany(r => r.Specimens)
+                   .HasForeignKey(s => s.RegionId)
+                   .OnDelete(DeleteBehavior.SetNull);
 
             // Уникальный индекс на InventoryNumber, если требуется
             builder.HasIndex(s => s.InventoryNumber).IsUnique();

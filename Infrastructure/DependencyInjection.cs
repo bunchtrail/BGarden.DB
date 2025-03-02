@@ -23,6 +23,7 @@ namespace BGarden.Infrastructure
             services.AddScoped<IExpositionRepository, ExpositionRepository>();
             services.AddScoped<IBiometryRepository, BiometryRepository>();
             services.AddScoped<IPhenologyRepository, PhenologyRepository>();
+            services.AddScoped<IRegionRepository, RegionRepository>();
 
             // Регистрируем UnitOfWork
             services.AddScoped<IUnitOfWork, UnitOfWork>();

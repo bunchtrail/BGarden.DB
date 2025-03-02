@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using BGarden.Domain.Entities;
+using NetTopologySuite.Geometries;
 
 namespace BGarden.Infrastructure.Data
 {
@@ -17,6 +18,7 @@ namespace BGarden.Infrastructure.Data
         public DbSet<Exposition> Expositions { get; set; } = null!;
         public DbSet<Phenology> Phenologies { get; set; } = null!;
         public DbSet<Biometry> Biometries { get; set; } = null!;
+        public DbSet<Region> Regions { get; set; } = null!;
 
         // Переопределим OnModelCreating, чтобы применить конфигурации
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -32,7 +34,8 @@ namespace BGarden.Infrastructure.Data
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseNpgsql(ConnectionString.PostgreSQL);
+                optionsBuilder.UseNpgsql(ConnectionString.PostgreSQL, 
+                    x => x.UseNetTopologySuite());
             }
         }
     }
