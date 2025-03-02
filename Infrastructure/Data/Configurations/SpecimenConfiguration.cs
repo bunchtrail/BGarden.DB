@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using BGarden.Domain.Entities;
+using BGarden.Domain.Enums;
 
 namespace BGarden.Infrastructure.Data.Configurations
 {
@@ -13,6 +14,11 @@ namespace BGarden.Infrastructure.Data.Configurations
 
             // Первичный ключ
             builder.HasKey(s => s.Id);
+
+            // Настройка для поля SectorType - хранить как int
+            builder.Property(s => s.SectorType)
+                   .HasConversion<int>()
+                   .IsRequired();
 
             // Уникальный индекс на InventoryNumber, если требуется
             builder.HasIndex(s => s.InventoryNumber).IsUnique();

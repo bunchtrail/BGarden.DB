@@ -10,7 +10,11 @@ namespace BGarden.Domain.Interfaces
     public interface IUnitOfWork : IDisposable
     {
         ISpecimenRepository Specimens { get; }
-        
+        IFamilyRepository Families { get; }
+        IExpositionRepository Expositions { get; }
+        IBiometryRepository Biometries { get; }
+        IPhenologyRepository Phenologies { get; }
+
         // Здесь можно добавить другие репозитории по мере необходимости
         // IFamilyRepository Families { get; }
         // IExpositionRepository Expositions { get; }

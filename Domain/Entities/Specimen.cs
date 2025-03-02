@@ -16,6 +16,11 @@ namespace BGarden.Domain.Entities
         public string InventoryNumber { get; set; } = null!;
 
         /// <summary>
+        /// Тип сектора, в котором находится образец.
+        /// </summary>
+        public BGarden.Domain.Enums.SectorType SectorType { get; set; }
+
+        /// <summary>
         /// Семейство (ссылка на сущность Family).
         /// </summary>
         public int FamilyId { get; set; }

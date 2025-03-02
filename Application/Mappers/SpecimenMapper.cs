@@ -14,6 +14,7 @@ namespace Application.Mappers
             {
                 Id = entity.Id,
                 InventoryNumber = entity.InventoryNumber,
+                SectorType = entity.SectorType,
                 FamilyId = entity.FamilyId,
                 FamilyName = entity.Family?.Name,
                 Genus = entity.Genus,
@@ -36,6 +37,7 @@ namespace Application.Mappers
             {
                 // Id = не задаём вручную, обычно автогенерируется
                 InventoryNumber = dto.InventoryNumber,
+                SectorType = dto.SectorType,
                 FamilyId = dto.FamilyId,
                 Genus = dto.Genus,
                 Species = dto.Species,
@@ -53,6 +55,7 @@ namespace Application.Mappers
         public static void UpdateEntity(this SpecimenDto dto, Specimen entity)
         {
             entity.InventoryNumber = dto.InventoryNumber;
+            entity.SectorType = dto.SectorType;
             entity.FamilyId = dto.FamilyId;
             entity.Genus = dto.Genus;
             entity.Species = dto.Species;

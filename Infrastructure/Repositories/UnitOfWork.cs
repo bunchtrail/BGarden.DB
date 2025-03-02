@@ -9,17 +9,33 @@ namespace BGarden.Infrastructure.Repositories
     {
         private readonly BotanicalContext _context;
         private readonly ISpecimenRepository _specimenRepository;
+        private readonly IFamilyRepository _familyRepository;
+        private readonly IExpositionRepository _expositionRepository;
+        private readonly IBiometryRepository _biometryRepository;
+        private readonly IPhenologyRepository _phenologyRepository;
         private bool _disposed = false;
 
         public UnitOfWork(
             BotanicalContext context,
-            ISpecimenRepository specimenRepository)
+            ISpecimenRepository specimenRepository,
+            IFamilyRepository familyRepository,
+            IExpositionRepository expositionRepository,
+            IBiometryRepository biometryRepository,
+            IPhenologyRepository phenologyRepository)
         {
             _context = context;
             _specimenRepository = specimenRepository;
+            _familyRepository = familyRepository;
+            _expositionRepository = expositionRepository;
+            _biometryRepository = biometryRepository;
+            _phenologyRepository = phenologyRepository;
         }
 
         public ISpecimenRepository Specimens => _specimenRepository;
+        public IFamilyRepository Families => _familyRepository;
+        public IExpositionRepository Expositions => _expositionRepository;
+        public IBiometryRepository Biometries => _biometryRepository;
+        public IPhenologyRepository Phenologies => _phenologyRepository;
 
         public async Task<int> SaveChangesAsync()
         {
