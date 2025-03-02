@@ -22,6 +22,16 @@ namespace BGarden.Domain.Entities
         public Family? Family { get; set; }
 
         /// <summary>
+        /// Русское название растения.
+        /// </summary>
+        public string? RussianName { get; set; }
+        
+        /// <summary>
+        /// Латинское название растения.
+        /// </summary>
+        public string? LatinName { get; set; }
+
+        /// <summary>
         /// Род (например, Rhododendron).
         /// </summary>
         public string? Genus { get; set; }

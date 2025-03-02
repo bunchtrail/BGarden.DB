@@ -1,0 +1,81 @@
+- **BGarden.DB**
+  - **.vs**
+  - **API**
+    - `API.csproj` (327.0 B)
+    - `API.http` (119.0 B)
+    - `appsettings.Development.json` (127.0 B)
+    - `appsettings.json` (151.0 B)
+    - **bin**
+    - **Controllers**
+      - `WeatherForecastController.cs` (1.0 KB)
+    - **obj**
+    - `Program.cs` (896.0 B)
+    - **Properties**
+      - `launchSettings.json` (1.1 KB)
+    - `WeatherForecast.cs` (283.0 B)
+  - **Application**
+    - `Application.csproj` (311.0 B)
+    - **bin**
+    - **DTO**
+      - `SpecimenDto.cs` (992.0 B)
+    - **Interfaces**
+      - `ISpecimenService.cs` (1.3 KB)
+    - **Mappers**
+      - `SpecimenMapper.cs` (2.4 KB)
+    - **obj**
+    - **Services**
+      - `SpecimenService.cs` (2.7 KB)
+    - **UseCases**
+      - `CreateSpecimenUseCase.cs` (2.2 KB)
+  - `BGarden.DB.sln` (1.9 KB)
+  - **docs**
+    - `Структура_BGarden-DB_от_02-03-2025.md` (2.4 KB)
+  - **Domain**
+    - **bin**
+    - `Domain.csproj` (218.0 B)
+    - **Entities**
+      - `Biometry.cs` (1.4 KB)
+      - `Exposition.cs` (936.0 B)
+      - `Family.cs` (744.0 B)
+      - `Phenology.cs` (1.5 KB)
+      - `Specimen.cs` (5.4 KB)
+    - **Enums**
+      - `SectorType.cs` (251.0 B)
+    - **Interfaces**
+      - `IRepository.cs` (584.0 B)
+      - `ISpecimenRepository.cs` (530.0 B)
+      - `IUnitOfWork.cs` (689.0 B)
+    - **obj**
+    - **Services**
+    - **ValueObjects**
+  - `ef-commands.cmd` (2.5 KB)
+  - **Infrastructure**
+    - **bin**
+    - **Data**
+      - `BotanicalContext.cs` (1.5 KB)
+      - **Configurations**
+        - `BiometryConfiguration.cs` (738.0 B)
+        - `ExpositionConfiguration.cs` (872.0 B)
+        - `FamilyConfiguration.cs` (868.0 B)
+        - `PhenologyConfiguration.cs` (917.0 B)
+        - `SpecimenConfiguration.cs` (3.3 KB)
+      - `ConnectionString.cs` (225.0 B)
+      - `DesignTimeDbContextFactory.cs` (541.0 B)
+      - **Migrations**
+    - `DependencyInjection.cs` (2.0 KB)
+    - `Infrastructure.csproj` (1.3 KB)
+    - **Migrations**
+      - `20250302162821_init.cs` (9.6 KB)
+      - `20250302162821_init.Designer.cs` (11.1 KB)
+      - `20250302164623_v1.cs` (1.0 KB)
+      - `20250302164623_v1.Designer.cs` (11.3 KB)
+      - `BotanicalContextModelSnapshot.cs` (11.2 KB)
+      - `README.md` (1.6 KB)
+    - **obj**
+    - `Program.cs` (711.0 B)
+    - **Repositories**
+      - `README.md` (2.9 KB)
+      - `RepositoryBase.cs` (1.3 KB)
+      - `SpecimenRepository.cs` (1.5 KB)
+      - `UnitOfWork.cs` (1.2 KB)
+    - **Services**
