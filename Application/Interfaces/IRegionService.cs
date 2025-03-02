@@ -7,17 +7,17 @@ using BGarden.Domain.Enums;
 namespace Application.Interfaces
 {
     /// <summary>
-    /// Контракт прикладного сервиса для работы с регионами (областями) ботанического сада
+    /// Контракт прикладного сервиса для работы с Region (областями).
     /// </summary>
     public interface IRegionService
     {
         /// <summary>
-        /// Получить все регионы
+        /// Получить все Region в виде DTO.
         /// </summary>
         Task<IEnumerable<RegionDto>> GetAllRegionsAsync();
 
         /// <summary>
-        /// Получить регион по идентификатору
+        /// Получить один Region по идентификатору.
         /// </summary>
         Task<RegionDto?> GetRegionByIdAsync(int id);
 
@@ -37,22 +37,22 @@ namespace Application.Interfaces
         Task<IEnumerable<RegionDto>> FindNearbyRegionsAsync(decimal latitude, decimal longitude, decimal radiusInMeters);
 
         /// <summary>
-        /// Создать новый регион (из DTO), вернёт созданный DTO (с Id)
+        /// Создать новый Region (из DTO), вернёт созданный DTO (с Id).
         /// </summary>
         Task<RegionDto> CreateRegionAsync(RegionDto regionDto);
 
         /// <summary>
-        /// Обновить существующий регион, вернёт обновлённый DTO
+        /// Обновить существующий Region, вернёт обновлённый DTO.
         /// </summary>
         Task<RegionDto?> UpdateRegionAsync(int id, RegionDto regionDto);
 
         /// <summary>
-        /// Удалить регион по Id, вернёт true, если успешно
+        /// Удалить Region по Id, вернёт true, если успешно.
         /// </summary>
         Task<bool> DeleteRegionAsync(int id);
-
+        
         /// <summary>
-        /// Получить все растения (экземпляры) в заданном регионе
+        /// Получить все образцы (Specimen) в указанном регионе.
         /// </summary>
         Task<IEnumerable<SpecimenDto>> GetSpecimensInRegionAsync(int regionId);
     }

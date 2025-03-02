@@ -5,7 +5,7 @@ using BGarden.Domain.Enums;
 namespace Application.DTO
 {
     /// <summary>
-    /// DTO для передачи данных о регионах (областях) ботанического сада
+    /// DTO для сущности Region (область, зона в ботаническом саду)
     /// </summary>
     public class RegionDto
     {
@@ -41,7 +41,6 @@ namespace Application.DTO
 
         /// <summary>
         /// Многоугольник, описывающий границы области (в формате Well-known text)
-        /// Например: "POLYGON((30 10, 40 40, 20 40, 10 20, 30 10))"
         /// </summary>
         public string? BoundaryWkt { get; set; }
 

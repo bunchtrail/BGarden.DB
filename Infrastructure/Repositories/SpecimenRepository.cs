@@ -28,6 +28,16 @@ namespace BGarden.Infrastructure.Repositories
                 .ToListAsync();
         }
 
+        /// <inheritdoc/>
+        public async Task<IEnumerable<Specimen>> GetSpecimensByRegionIdAsync(int regionId)
+        {
+            return await _dbSet
+                .Where(x => x.RegionId == regionId)
+                .Include(s => s.Family)
+                .Include(s => s.Exposition)
+                .ToListAsync();
+        }
+
         // Можно добавить дополнительные методы для загрузки связанных данных, например:
         public async Task<Specimen?> GetByIdWithDetailsAsync(int id)
         {

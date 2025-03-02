@@ -6,107 +6,79 @@ using NetTopologySuite.IO;
 
 namespace Application.Mappers
 {
+    /// <summary>
+    /// Утилитарный класс для маппинга между доменной сущностью Region и DTO.
+    /// </summary>
     public static class RegionMapper
     {
         /// <summary>
-        /// Преобразовать доменную сущность в DTO.
+        /// Преобразует сущность Region в DTO.
         /// </summary>
-        public static RegionDto ToDto(this Region entity)
+        public static RegionDto ToDto(this Region region)
         {
+            if (region == null)
+                return null!;
+
             return new RegionDto
             {
-                Id = entity.Id,
-                Name = entity.Name,
-                Description = entity.Description,
-                Latitude = entity.Latitude,
-                Longitude = entity.Longitude,
-                Radius = entity.Radius,
-                BoundaryWkt = entity.Boundary?.AsText(),
-                SectorType = entity.SectorType,
-                SpecimensCount = entity.Specimens?.Count ?? 0
+                Id = region.Id,
+                Name = region.Name,
+                Description = region.Description,
+                Latitude = region.Latitude,
+                Longitude = region.Longitude,
+                Radius = region.Radius,
+                BoundaryWkt = region.BoundaryWkt,
+                SectorType = region.SectorType
             };
         }
 
         /// <summary>
-        /// Преобразовать DTO в доменную сущность (новый объект Region).
+        /// Преобразует коллекцию Region в коллекцию DTO.
+        /// </summary>
+        public static IEnumerable<RegionDto> ToDto(this IEnumerable<Region> regions)
+        {
+            if (regions == null)
+                return Enumerable.Empty<RegionDto>();
+
+            return regions.Select(r => r.ToDto());
+        }
+
+        /// <summary>
+        /// Обновляет существующую сущность Region данными из DTO.
+        /// </summary>
+        public static void UpdateFromDto(this Region region, RegionDto dto)
+        {
+            if (region == null || dto == null)
+                return;
+
+            region.Name = dto.Name;
+            region.Description = dto.Description;
+            region.Latitude = dto.Latitude;
+            region.Longitude = dto.Longitude;
+            region.Radius = dto.Radius;
+            region.BoundaryWkt = dto.BoundaryWkt;
+            region.SectorType = dto.SectorType;
+        }
+
+        /// <summary>
+        /// Создаёт новую сущность Region из DTO.
         /// </summary>
         public static Region ToEntity(this RegionDto dto)
         {
-            var region = new Region
+            if (dto == null)
+                return null!;
+
+            return new Region
             {
-                // Id = не задаём вручную, обычно автогенерируется
+                // Id не устанавливаем, его присвоит БД
                 Name = dto.Name,
                 Description = dto.Description,
                 Latitude = dto.Latitude,
                 Longitude = dto.Longitude,
                 Radius = dto.Radius,
+                BoundaryWkt = dto.BoundaryWkt,
                 SectorType = dto.SectorType
             };
-
-            // Установка географической точки
-            region.Location = new Point((double)dto.Longitude, (double)dto.Latitude) { SRID = 4326 };
-
-            // Попытка преобразовать WKT в Polygon, если он указан
-            if (!string.IsNullOrEmpty(dto.BoundaryWkt))
-            {
-                try
-                {
-                    var wktReader = new WKTReader();
-                    var geometry = wktReader.Read(dto.BoundaryWkt);
-                    
-                    if (geometry is Polygon polygon)
-                    {
-                        polygon.SRID = 4326;
-                        region.Boundary = polygon;
-                    }
-                }
-                catch
-                {
-                    // Игнорируем ошибки при парсинге WKT
-                }
-            }
-
-            return region;
-        }
-
-        /// <summary>
-        /// Обновить существующую сущность (merge) на основе данных DTO.
-        /// </summary>
-        public static void UpdateEntity(this RegionDto dto, Region entity)
-        {
-            entity.Name = dto.Name;
-            entity.Description = dto.Description;
-            entity.Latitude = dto.Latitude;
-            entity.Longitude = dto.Longitude;
-            entity.Radius = dto.Radius;
-            entity.SectorType = dto.SectorType;
-
-            // Обновление географической точки
-            entity.Location = new Point((double)dto.Longitude, (double)dto.Latitude) { SRID = 4326 };
-
-            // Попытка преобразовать WKT в Polygon, если он указан
-            if (!string.IsNullOrEmpty(dto.BoundaryWkt))
-            {
-                try
-                {
-                    var wktReader = new WKTReader();
-                    var geometry = wktReader.Read(dto.BoundaryWkt);
-                    
-                    if (geometry is Polygon polygon)
-                    {
-                        polygon.SRID = 4326;
-                        entity.Boundary = polygon;
-                    }
-                }
-                catch
-                {
-                    // Игнорируем ошибки при парсинге WKT
-                }
-            }
-            else
-            {
-                entity.Boundary = null;
-            }
         }
     }
 } 
