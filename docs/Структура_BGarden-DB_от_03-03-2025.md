@@ -3,15 +3,20 @@
   - **Application**
     - `Application.csproj` (596.0 B)
     - **bin**
-    - `DependencyInjection.cs` (1.2 KB)
+    - `DependencyInjection.cs` (1.5 KB)
     - **DTO**
+      - `AuthLogDto.cs` (1.9 KB)
       - `BiometryDto.cs` (1.2 KB)
       - `ExpositionDto.cs` (788.0 B)
       - `FamilyDto.cs` (792.0 B)
+      - `LoginDto.cs` (1.1 KB)
       - `PhenologyDto.cs` (1.4 KB)
+      - `RefreshTokenDto.cs` (564.0 B)
       - `RegionDto.cs` (2.0 KB)
       - `SpecimenDto.cs` (2.6 KB)
-      - `UserDto.cs` (4.9 KB)
+      - `TokenDto.cs` (1.2 KB)
+      - `TwoFactorSetupDto.cs` (1.0 KB)
+      - `UserDto.cs` (4.5 KB)
     - **Interfaces**
       - `IBiometryService.cs` (2.3 KB)
       - `IExpositionService.cs` (1.5 KB)
@@ -21,6 +26,7 @@
       - `ISpecimenService.cs` (1.3 KB)
       - `IUserService.cs` (2.0 KB)
     - **Mappers**
+      - `AuthMapper.cs` (2.7 KB)
       - `BiometryMapper.cs` (1.9 KB)
       - `ExpositionMapper.cs` (1.5 KB)
       - `FamilyMapper.cs` (1.4 KB)
@@ -38,26 +44,32 @@
       - `SpecimenService.cs` (2.7 KB)
       - `UserService.cs` (6.4 KB)
     - **UseCases**
+      - `AuthUseCase.cs` (16.7 KB)
       - `CreateSpecimenUseCase.cs` (2.2 KB)
+      - **Interfaces**
+        - `IAuthUseCase.cs` (4.0 KB)
   - `BGarden.DB.sln` (2.4 KB)
   - **docs**
-    - `Структура_BGarden-DB_от_02-03-2025.md` (3.9 KB)
+    - `Структура_BGarden-DB_от_03-03-2025.md` (4.5 KB)
   - **Domain**
     - **bin**
     - `Domain.csproj` (320.0 B)
     - **Entities**
+      - `AuthLog.cs` (1.9 KB)
       - `Biometry.cs` (1.4 KB)
       - `Exposition.cs` (936.0 B)
       - `Family.cs` (744.0 B)
       - `Phenology.cs` (1.5 KB)
+      - `RefreshToken.cs` (2.1 KB)
       - `Region.cs` (2.5 KB)
       - `Specimen.cs` (7.2 KB)
-      - `User.cs` (2.5 KB)
+      - `User.cs` (3.3 KB)
     - **Enums**
+      - `AuthEventType.cs` (1.4 KB)
       - `SectorType.cs` (251.0 B)
       - `UserRole.cs` (728.0 B)
     - **Interfaces**
-      - `IAuthService.cs` (1.5 KB)
+      - `IAuthService.cs` (3.5 KB)
       - `IBiometryRepository.cs` (692.0 B)
       - `IExpositionRepository.cs` (517.0 B)
       - `IFamilyRepository.cs` (512.0 B)
@@ -74,20 +86,22 @@
   - **Infrastructure**
     - **bin**
     - **Data**
-      - `BotanicalContext.cs` (1.6 KB)
+      - `BotanicalContext.cs` (1.9 KB)
       - **Configurations**
+        - `AuthLogConfiguration.cs` (2.1 KB)
         - `BiometryConfiguration.cs` (738.0 B)
         - `ExpositionConfiguration.cs` (872.0 B)
         - `FamilyConfiguration.cs` (868.0 B)
         - `PhenologyConfiguration.cs` (917.0 B)
+        - `RefreshTokenConfiguration.cs` (1.7 KB)
         - `RegionConfiguration.cs` (2.7 KB)
         - `SpecimenConfiguration.cs` (5.4 KB)
-        - `UserConfiguration.cs` (2.3 KB)
+        - `UserConfiguration.cs` (2.8 KB)
       - `ConnectionString.cs` (225.0 B)
       - `DesignTimeDbContextFactory.cs` (541.0 B)
       - **Migrations**
     - `DependencyInjection.cs` (1.7 KB)
-    - `Infrastructure.csproj` (1.5 KB)
+    - `Infrastructure.csproj` (1.7 KB)
     - **Migrations**
       - `20250302162821_init.cs` (9.6 KB)
       - `20250302162821_init.Designer.cs` (11.1 KB)
@@ -97,7 +111,11 @@
       - `20250302181406_AddSectorTypeToSpecimen.Designer.cs` (11.4 KB)
       - `20250302191400_v2.cs` (7.7 KB)
       - `20250302191400_v2.Designer.cs` (16.9 KB)
-      - `BotanicalContextModelSnapshot.cs` (16.8 KB)
+      - `20250303094051_SecurityEnhancement.cs` (6.3 KB)
+      - `20250303094051_SecurityEnhancement.Designer.cs` (21.8 KB)
+      - `20250303094948_v3.cs` (447.0 B)
+      - `20250303094948_v3.Designer.cs` (21.8 KB)
+      - `BotanicalContextModelSnapshot.cs` (21.7 KB)
       - `README.md` (1.6 KB)
     - **obj**
     - `Program.cs` (711.0 B)
@@ -113,4 +131,4 @@
       - `UnitOfWork.cs` (2.6 KB)
       - `UserRepository.cs` (1.9 KB)
     - **Services**
-      - `AuthService.cs` (7.5 KB)
+      - `AuthService.cs` (23.0 KB)

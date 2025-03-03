@@ -137,19 +137,5 @@ namespace BGarden.Application.DTO
         public string NewPassword { get; set; } = null!;
     }
     
-    /// <summary>
-    /// DTO для аутентификации пользователя
-    /// </summary>
-    public class LoginDto
-    {
-        /// <summary>
-        /// Имя пользователя
-        /// </summary>
-        public string Username { get; set; } = null!;
-        
-        /// <summary>
-        /// Пароль
-        /// </summary>
-        public string Password { get; set; } = null!;
-    }
+
 } 

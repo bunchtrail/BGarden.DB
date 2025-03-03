@@ -5,6 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using BGarden.Application.Interfaces;
 using BGarden.Application.Services;
+using BGarden.Application.UseCases;
+using BGarden.Application.UseCases.Interfaces;
 
 namespace Application
 {
@@ -24,6 +26,9 @@ namespace Application
             // Регистрируем UseCase'ы
             services.AddScoped<CreateSpecimenUseCase>();
             // Другие use cases по мере необходимости
+            
+            // Регистрируем сервисы аутентификации
+            services.AddScoped<IAuthUseCase, AuthUseCase>();
             
             return services;
         }

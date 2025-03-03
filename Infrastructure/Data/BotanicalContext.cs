@@ -20,6 +20,10 @@ namespace BGarden.Infrastructure.Data
         public DbSet<Biometry> Biometries { get; set; } = null!;
         public DbSet<Region> Regions { get; set; } = null!;
         public DbSet<User> Users { get; set; } = null!;
+        
+        // Новые сущности для улучшения безопасности
+        public DbSet<AuthLog> AuthLogs { get; set; } = null!;
+        public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
 
         // Переопределим OnModelCreating, чтобы применить конфигурации
         protected override void OnModelCreating(ModelBuilder modelBuilder)

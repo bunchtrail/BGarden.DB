@@ -65,6 +65,26 @@ namespace BGarden.Domain.Entities
         public bool IsActive { get; set; } = true;
         
         /// <summary>
+        /// Количество неудачных попыток входа
+        /// </summary>
+        public int FailedLoginAttempts { get; set; }
+        
+        /// <summary>
+        /// Время блокировки аккаунта (если установлено)
+        /// </summary>
+        public DateTime? LockoutEnd { get; set; }
+        
+        /// <summary>
+        /// Включена ли двухфакторная аутентификация
+        /// </summary>
+        public bool TwoFactorEnabled { get; set; }
+        
+        /// <summary>
+        /// Секретный ключ для двухфакторной аутентификации
+        /// </summary>
+        public string? TwoFactorKey { get; set; }
+        
+        /// <summary>
         /// Образцы, созданные или измененные данным пользователем (только для работников)
         /// </summary>
         public ICollection<Specimen>? ManagedSpecimens { get; set; }

@@ -52,6 +52,20 @@ namespace BGarden.Infrastructure.Data.Configurations
             builder.Property(u => u.CreatedAt)
                    .IsRequired();
                    
+            // Новые поля для безопасности
+            builder.Property(u => u.FailedLoginAttempts)
+                   .HasDefaultValue(0);
+                   
+            builder.Property(u => u.LockoutEnd)
+                   .IsRequired(false);
+                   
+            builder.Property(u => u.TwoFactorEnabled)
+                   .HasDefaultValue(false);
+                   
+            builder.Property(u => u.TwoFactorKey)
+                   .HasMaxLength(128)
+                   .IsRequired(false);
+                   
             // Связь с Specimen (One-to-Many)
             builder.HasMany(u => u.ManagedSpecimens)
                    .WithOne(s => s.CreatedByUser)
