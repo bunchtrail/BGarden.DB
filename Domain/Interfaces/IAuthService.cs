@@ -13,7 +13,7 @@ namespace BGarden.Domain.Interfaces
         /// <summary>
         /// Аутентификация пользователя по логину и паролю
         /// </summary>
-        Task<User?> AuthenticateAsync(string username, string password, string? ipAddress = null);
+        Task<User?> AuthenticateAsync(string username, string password, string? ipAddress = null, string? userAgent = null);
         
         /// <summary>
         /// Создание нового пользователя

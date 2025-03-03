@@ -32,7 +32,12 @@ namespace BGarden.Application.UseCases
         {
             try
             {
-                var user = await _authService.AuthenticateAsync(loginDto.Username, loginDto.Password, loginDto.IpAddress);
+                var user = await _authService.AuthenticateAsync(
+                    loginDto.Username, 
+                    loginDto.Password, 
+                    loginDto.IpAddress,
+                    loginDto.UserAgent
+                );
                 
                 if (user == null)
                 {
@@ -40,35 +45,34 @@ namespace BGarden.Application.UseCases
                     return null;
                 }
                 
-                // Если включена двухфакторная аутентификация и код не предоставлен
+                // Если требуется 2FA и она включена
                 if (user.TwoFactorEnabled && string.IsNullOrEmpty(loginDto.TwoFactorCode))
                 {
-                    return new TokenDto
-                    {
+                    _logger.LogInformation("Требуется двухфакторная аутентификация для пользователя {Username}", loginDto.Username);
+                    return new TokenDto 
+                    { 
                         Username = user.Username,
                         RequiresTwoFactor = true
                     };
                 }
                 
-                // Если включена двухфакторная аутентификация и код предоставлен
+                // Если требуется 2FA и предоставлен код
                 if (user.TwoFactorEnabled && !string.IsNullOrEmpty(loginDto.TwoFactorCode))
                 {
-                    bool isValid = await _authService.VerifyTwoFactorCodeAsync(user.Id, loginDto.TwoFactorCode);
+                    var isValid = await _authService.VerifyTwoFactorCodeAsync(user.Id, loginDto.TwoFactorCode);
                     if (!isValid)
                     {
-                        _logger.LogWarning("Неверный код двухфакторной аутентификации для пользователя {Username}", loginDto.Username);
+                        _logger.LogWarning("Неверный код 2FA для пользователя {Username}", loginDto.Username);
                         return null;
                     }
                 }
                 
                 // Генерируем JWT токен
-                string jwtToken = await _authService.GenerateJwtTokenAsync(user);
+                var jwtToken = await _authService.GenerateJwtTokenAsync(user);
+                var refreshToken = await _authService.GenerateRefreshTokenAsync(user, loginDto.IpAddress ?? "Unknown");
                 
-                // Генерируем Refresh токен
-                var refreshToken = await _authService.GenerateRefreshTokenAsync(user, loginDto.IpAddress ?? "unknown");
-                
-                // Определяем срок действия токена
-                DateTime expiration = DateTime.UtcNow.AddMinutes(loginDto.RememberMe ? 1440 : 60); // 24 часа или 1 час
+                // Определяем срок действия токена (1 час или 24 часа, если "запомнить меня")
+                var expiration = DateTime.UtcNow.AddMinutes(loginDto.RememberMe ? 1440 : 60);
                 
                 _logger.LogInformation("Пользователь {Username} успешно вошел в систему", loginDto.Username);
                 
@@ -76,7 +80,7 @@ namespace BGarden.Application.UseCases
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Ошибка при входе пользователя {Username}", loginDto.Username);
+                _logger.LogError(ex, "Ошибка при попытке входа пользователя {Username}", loginDto.Username);
                 throw;
             }
         }
@@ -87,7 +91,7 @@ namespace BGarden.Application.UseCases
             try
             {
                 var (jwtToken, refreshToken) = await _authService.RefreshTokenAsync(
-                    refreshTokenDto.RefreshToken, 
+                    refreshTokenDto.Token, 
                     refreshTokenDto.IpAddress ?? "unknown"
                 );
                 

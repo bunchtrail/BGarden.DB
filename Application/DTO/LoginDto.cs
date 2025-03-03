@@ -21,6 +21,11 @@ namespace BGarden.Application.DTO
         public string? IpAddress { get; set; }
         
         /// <summary>
+        /// User-Agent браузера или клиента (опционально)
+        /// </summary>
+        public string? UserAgent { get; set; }
+        
+        /// <summary>
         /// Код подтверждения для двухфакторной аутентификации (опционально)
         /// </summary>
         public string? TwoFactorCode { get; set; }

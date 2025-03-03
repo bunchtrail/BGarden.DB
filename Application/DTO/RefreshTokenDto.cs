@@ -8,7 +8,7 @@ namespace BGarden.Application.DTO
         /// <summary>
         /// Токен обновления
         /// </summary>
-        public string RefreshToken { get; set; } = null!;
+        public string Token { get; set; } = null!;
         
         /// <summary>
         /// IP-адрес, с которого запрашивается обновление токена

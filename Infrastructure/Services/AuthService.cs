@@ -31,7 +31,7 @@ namespace BGarden.Infrastructure.Services
             _context = context;
         }
         
-        public async Task<User?> AuthenticateAsync(string username, string password, string? ipAddress = null)
+        public async Task<User?> AuthenticateAsync(string username, string password, string? ipAddress = null, string? userAgent = null)
         {
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
                 return null;
@@ -42,47 +42,26 @@ namespace BGarden.Infrastructure.Services
             // Проверка существования пользователя
             if (user == null)
             {
-                await LogAuthEventAsync(AuthEventType.FailedLogin, username, null, false, "Пользователь не найден", ipAddress);
+                await LogAuthEventAsync(AuthEventType.FailedLogin, username, null, false, "Пользователь не найден", ipAddress, userAgent);
                 return null;
             }
 
             // Проверка активности аккаунта
             if (!user.IsActive)
             {
-                await LogAuthEventAsync(AuthEventType.FailedLogin, username, user.Id, false, "Аккаунт не активен", ipAddress);
+                await LogAuthEventAsync(AuthEventType.FailedLogin, username, user.Id, false, "Аккаунт деактивирован", ipAddress, userAgent);
                 return null;
             }
             
             // Проверка блокировки аккаунта
             if (user.LockoutEnd.HasValue && user.LockoutEnd > DateTime.UtcNow)
             {
-                await LogAuthEventAsync(AuthEventType.FailedLogin, username, user.Id, false, 
-                    $"Аккаунт заблокирован до {user.LockoutEnd.Value}", ipAddress);
+                await LogAuthEventAsync(AuthEventType.FailedLogin, username, user.Id, false, "Аккаунт заблокирован", ipAddress, userAgent);
                 return null;
             }
 
             // Проверяем пароль
-            bool isPasswordValid;
-            
-            // Сначала проверяем старым методом HMACSHA512 (для обратной совместимости)
-            if (user.PasswordSalt.Length > 24) // Предположим, что соль HMACSHA512 длиннее
-            {
-                isPasswordValid = VerifyPasswordHashLegacy(password, user.PasswordHash, user.PasswordSalt);
-                
-                // Если успешно, мигрируем пароль на BCrypt
-                if (isPasswordValid)
-                {
-                    // Перехешируем пароль с BCrypt
-                    string bcryptHash = BCrypt.Net.BCrypt.HashPassword(password);
-                    user.PasswordHash = bcryptHash;
-                    user.PasswordSalt = string.Empty; // BCrypt хранит соль в самом хеше
-                }
-            }
-            else
-            {
-                // Используем новый метод BCrypt
-                isPasswordValid = BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);
-            }
+            bool isPasswordValid = BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);
             
             if (!isPasswordValid)
             {
@@ -94,12 +73,12 @@ namespace BGarden.Infrastructure.Services
                 {
                     user.LockoutEnd = DateTime.UtcNow.AddMinutes(15);
                     await LogAuthEventAsync(AuthEventType.AccountLocked, username, user.Id, false, 
-                        $"Аккаунт заблокирован на 15 минут после {user.FailedLoginAttempts} неудачных попыток", ipAddress);
+                        $"Аккаунт заблокирован на 15 минут после {user.FailedLoginAttempts} неудачных попыток", ipAddress, userAgent);
                 }
                 else 
                 {
                     await LogAuthEventAsync(AuthEventType.FailedLogin, username, user.Id, false, 
-                        $"Неверный пароль. Попытка {user.FailedLoginAttempts}/5", ipAddress);
+                        $"Неверный пароль. Попытка {user.FailedLoginAttempts}/5", ipAddress, userAgent);
                 }
                 
                 await _context.SaveChangesAsync();
@@ -114,7 +93,7 @@ namespace BGarden.Infrastructure.Services
             user.LastLogin = DateTime.UtcNow;
             await _context.SaveChangesAsync();
             
-            await LogAuthEventAsync(AuthEventType.Login, username, user.Id, true, "Успешный вход", ipAddress);
+            await LogAuthEventAsync(AuthEventType.Login, username, user.Id, true, "Успешный вход", ipAddress, userAgent);
 
             return user;
         }
@@ -206,18 +185,7 @@ namespace BGarden.Infrastructure.Services
                 throw new InvalidOperationException("Пользователь не найден");
                 
             // Проверка текущего пароля
-            bool isPasswordValid;
-            
-            // Сначала проверяем старым методом HMACSHA512 (для обратной совместимости)
-            if (user.PasswordSalt.Length > 24)
-            {
-                isPasswordValid = VerifyPasswordHashLegacy(currentPassword, user.PasswordHash, user.PasswordSalt);
-            }
-            else 
-            {
-                // Используем новый метод BCrypt
-                isPasswordValid = BCrypt.Net.BCrypt.Verify(currentPassword, user.PasswordHash);
-            }
+            bool isPasswordValid = BCrypt.Net.BCrypt.Verify(currentPassword, user.PasswordHash);
             
             if (!isPasswordValid)
                 throw new InvalidOperationException("Неверный текущий пароль");
@@ -486,21 +454,6 @@ namespace BGarden.Infrastructure.Services
         
         // Вспомогательные методы
         
-        // Устаревший метод проверки пароля (для обратной совместимости)
-        private static bool VerifyPasswordHashLegacy(string password, string storedHash, string storedSalt)
-        {
-            var saltBytes = Convert.FromBase64String(storedSalt);
-            
-            using (var hmac = new HMACSHA512(saltBytes))
-            {
-                var computedHash = Convert.ToBase64String(
-                    hmac.ComputeHash(Encoding.UTF8.GetBytes(password))
-                );
-                
-                return computedHash == storedHash;
-            }
-        }
-        
         // Генерация случайного токена
         private string GenerateUniqueToken()
         {
@@ -513,7 +466,7 @@ namespace BGarden.Infrastructure.Services
         }
         
         // Логирование событий авторизации
-        private async Task LogAuthEventAsync(AuthEventType eventType, string username, int? userId, bool success, string? details = null, string? ipAddress = null)
+        private async Task LogAuthEventAsync(AuthEventType eventType, string username, int? userId, bool success, string? details = null, string? ipAddress = null, string? userAgent = null)
         {
             var authLog = new AuthLog
             {
@@ -523,7 +476,8 @@ namespace BGarden.Infrastructure.Services
                 Success = success,
                 Timestamp = DateTime.UtcNow,
                 Details = details,
-                IpAddress = ipAddress
+                IpAddress = ipAddress,
+                UserAgent = userAgent
             };
             
             await _context.AuthLogs.AddAsync(authLog);
