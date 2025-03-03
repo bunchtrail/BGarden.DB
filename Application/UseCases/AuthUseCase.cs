@@ -7,6 +7,8 @@ using BGarden.Application.UseCases.Interfaces;
 using BGarden.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
 using System.Text.RegularExpressions;
+using BGarden.Domain.Entities;
+using BGarden.Domain.Enums;
 
 namespace BGarden.Application.UseCases
 {
@@ -25,6 +27,47 @@ namespace BGarden.Application.UseCases
         {
             _authService = authService ?? throw new ArgumentNullException(nameof(authService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
+
+        /// <inheritdoc/>
+        public async Task<TokenDto> RegisterAsync(RegisterDto registerDto)
+        {
+            try
+            {
+                // Проверка сложности пароля
+                if (!IsStrongPassword(registerDto.Password))
+                {
+                    throw new InvalidOperationException("Пароль должен содержать минимум 8 символов, включая заглавные и строчные буквы, цифры и специальные символы");
+                }
+                
+                // Создаем нового пользователя используя маппер
+                var user = registerDto.ToEntity();
+                
+                // Вызываем сервис создания пользователя
+                user = await _authService.CreateUserAsync(user, registerDto.Password, registerDto.IpAddress);
+                
+                _logger.LogInformation("Успешная регистрация пользователя {Username}", registerDto.Username);
+                
+                // Генерируем JWT токен
+                var jwtToken = await _authService.GenerateJwtTokenAsync(user);
+                
+                // Генерируем refresh токен
+                var refreshToken = await _authService.GenerateRefreshTokenAsync(user, registerDto.IpAddress ?? "unknown");
+                
+                // Возвращаем токены
+                return AuthMapper.CreateTokenDto(
+                    jwtToken, 
+                    refreshToken, 
+                    DateTime.UtcNow.AddMinutes(15), // Время жизни токена
+                    user.Username
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Ошибка при регистрации пользователя {Username}: {Message}", 
+                    registerDto.Username, ex.Message);
+                throw;
+            }
         }
 
         /// <inheritdoc/>
@@ -339,6 +382,23 @@ namespace BGarden.Application.UseCases
                 _logger.LogError(ex, "Ошибка при разблокировке аккаунта пользователя {Username}", username);
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Проверка сложности пароля
+        /// </summary>
+        private bool IsStrongPassword(string password)
+        {
+            var hasUpperCase = new Regex(@"[A-Z]");
+            var hasLowerCase = new Regex(@"[a-z]");
+            var hasDigit = new Regex(@"[0-9]");
+            var hasSpecialChar = new Regex(@"[!@#$%^&*()_+\-=\[\]{};':\\|,.<>\/?]");
+            
+            return password.Length >= 8 && 
+                   hasUpperCase.IsMatch(password) && 
+                   hasLowerCase.IsMatch(password) && 
+                   hasDigit.IsMatch(password) && 
+                   hasSpecialChar.IsMatch(password);
         }
     }
 } 

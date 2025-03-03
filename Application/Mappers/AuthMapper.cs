@@ -13,6 +13,25 @@ namespace BGarden.Application.Mappers
     public static class AuthMapper
     {
         /// <summary>
+        /// Преобразует RegisterDto в сущность User
+        /// </summary>
+        public static User ToEntity(this RegisterDto dto)
+        {
+            if (dto == null)
+                throw new ArgumentNullException(nameof(dto));
+
+            return new User
+            {
+                Username = dto.Username,
+                Email = dto.Email,
+                FullName = $"{dto.FirstName} {dto.LastName}",
+                Role = dto.Role,
+                CreatedAt = DateTime.UtcNow,
+                IsActive = true
+            };
+        }
+
+        /// <summary>
         /// Преобразует сущность AuthLog в AuthLogDto
         /// </summary>
         public static AuthLogDto ToDto(this AuthLog entity)

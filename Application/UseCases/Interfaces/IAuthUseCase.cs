@@ -10,6 +10,13 @@ namespace BGarden.Application.UseCases.Interfaces
     public interface IAuthUseCase
     {
         /// <summary>
+        /// Регистрация нового пользователя
+        /// </summary>
+        /// <param name="registerDto">Данные для регистрации</param>
+        /// <returns>Токен доступа</returns>
+        Task<TokenDto> RegisterAsync(RegisterDto registerDto);
+        
+        /// <summary>
         /// Авторизация пользователя
         /// </summary>
         /// <param name="loginDto">Данные для входа</param>

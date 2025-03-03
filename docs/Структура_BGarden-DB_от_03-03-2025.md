@@ -13,6 +13,7 @@
       - `PhenologyDto.cs` (1.4 KB)
       - `RefreshTokenDto.cs` (557.0 B)
       - `RegionDto.cs` (2.0 KB)
+      - `RegisterDto.cs` (1.9 KB)
       - `SpecimenDto.cs` (2.6 KB)
       - `TokenDto.cs` (1.2 KB)
       - `TwoFactorSetupDto.cs` (1.0 KB)
@@ -26,7 +27,7 @@
       - `ISpecimenService.cs` (1.3 KB)
       - `IUserService.cs` (2.0 KB)
     - **Mappers**
-      - `AuthMapper.cs` (2.7 KB)
+      - `AuthMapper.cs` (3.3 KB)
       - `BiometryMapper.cs` (1.9 KB)
       - `ExpositionMapper.cs` (1.5 KB)
       - `FamilyMapper.cs` (1.4 KB)
@@ -44,13 +45,13 @@
       - `SpecimenService.cs` (2.7 KB)
       - `UserService.cs` (6.4 KB)
     - **UseCases**
-      - `AuthUseCase.cs` (16.8 KB)
+      - `AuthUseCase.cs` (19.6 KB)
       - `CreateSpecimenUseCase.cs` (2.2 KB)
       - **Interfaces**
-        - `IAuthUseCase.cs` (4.0 KB)
+        - `IAuthUseCase.cs` (4.3 KB)
   - `BGarden.DB.sln` (2.4 KB)
   - **docs**
-    - `Структура_BGarden-DB_от_03-03-2025.md` (4.5 KB)
+    - `Структура_BGarden-DB_от_03-03-2025.md` (4.6 KB)
   - **Domain**
     - **bin**
     - `Domain.csproj` (320.0 B)
