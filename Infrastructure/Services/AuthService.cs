@@ -14,13 +14,14 @@ using BGarden.Domain.Interfaces;
 using BGarden.Infrastructure.Data;
 using BCrypt.Net;
 using Google.Authenticator;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace BGarden.Infrastructure.Services
 {
     public class AuthService : IAuthService
     {
         private readonly BotanicalContext _context;
-        private readonly string _jwtSecret = "YourSecretKeyHere_ThisShouldBeInConfigAndAtLeast32CharsLong"; // В реальном приложении должно быть в конфигурации
+        private readonly string _jwtSecret = "YourSuperSecretKeyForBotanicalGardenApp-MustBeAtLeast32BytesLong"; // Должно совпадать с конфигурацией
         private readonly string _issuer = "BGarden.API";
         private readonly string _audience = "BGarden.Client";
         private readonly int _jwtLifetimeMinutes = 15;
@@ -272,6 +273,7 @@ namespace BGarden.Infrastructure.Services
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Name, user.Username),
+                new Claim(ClaimTypes.Name, user.Username), // Добавляем стандартный клейм для имени
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
                 new Claim(ClaimTypes.Role, user.Role.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
@@ -279,7 +281,7 @@ namespace BGarden.Infrastructure.Services
             
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(claims),
+                Subject = new ClaimsIdentity(claims, JwtBearerDefaults.AuthenticationScheme), // Указываем схему аутентификации
                 Expires = DateTime.UtcNow.AddMinutes(_jwtLifetimeMinutes),
                 Issuer = _issuer,
                 Audience = _audience,

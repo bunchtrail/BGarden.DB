@@ -51,7 +51,7 @@
         - `IAuthUseCase.cs` (4.3 KB)
   - `BGarden.DB.sln` (2.4 KB)
   - **docs**
-    - `Структура_BGarden-DB_от_03-03-2025.md` (4.6 KB)
+    - `Структура_BGarden-DB_от_04-03-2025.md` (4.5 KB)
   - **Domain**
     - **bin**
     - `Domain.csproj` (320.0 B)
