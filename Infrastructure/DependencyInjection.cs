@@ -31,7 +31,12 @@ namespace BGarden.Infrastructure
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             
             // Регистрируем сервисы
-            services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IAuthService>(provider => 
+                new AuthService(
+                    provider.GetRequiredService<BotanicalContext>(),
+                    configuration
+                )
+            );
 
             return services;
         }

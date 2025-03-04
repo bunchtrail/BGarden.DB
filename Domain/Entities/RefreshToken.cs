@@ -23,14 +23,24 @@ namespace BGarden.Domain.Entities
         public DateTime ExpiryDate { get; set; }
         
         /// <summary>
-        /// Отозван ли токен
+        /// Дата отзыва токена (null если не отозван)
         /// </summary>
-        public bool IsRevoked { get; set; }
+        public DateTime? Revoked { get; set; }
+        
+        /// <summary>
+        /// Причина отзыва токена
+        /// </summary>
+        public string? ReasonRevoked { get; set; }
         
         /// <summary>
         /// Дата создания токена
         /// </summary>
         public DateTime CreatedAt { get; set; }
+        
+        /// <summary>
+        /// Дата создания токена (альтернативное имя для совместимости)
+        /// </summary>
+        public DateTime Created { get => CreatedAt; set => CreatedAt = value; }
         
         /// <summary>
         /// IP-адрес, с которого был создан токен
@@ -60,6 +70,11 @@ namespace BGarden.Domain.Entities
         /// <summary>
         /// Активен ли токен (не просрочен и не отозван)
         /// </summary>
-        public bool IsActive => !IsRevoked && DateTime.UtcNow < ExpiryDate;
+        public bool IsActive => Revoked == null && DateTime.UtcNow < ExpiryDate;
+        
+        /// <summary>
+        /// Отозван ли токен (для обратной совместимости)
+        /// </summary>
+        public bool IsRevoked { get => Revoked != null; set { if (value) Revoked = DateTime.UtcNow; } }
     }
 } 

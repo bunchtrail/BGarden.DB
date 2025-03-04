@@ -41,11 +41,6 @@ namespace BGarden.Domain.Interfaces
         bool HasPermission(User user, string operation);
         
         /// <summary>
-        /// Генерация JWT токена
-        /// </summary>
-        Task<string> GenerateJwtTokenAsync(User user);
-        
-        /// <summary>
         /// Генерация Refresh токена
         /// </summary>
         Task<RefreshToken> GenerateRefreshTokenAsync(User user, string ipAddress);
@@ -53,7 +48,7 @@ namespace BGarden.Domain.Interfaces
         /// <summary>
         /// Обновление токена доступа с помощью Refresh токена
         /// </summary>
-        Task<(string JwtToken, RefreshToken RefreshToken)> RefreshTokenAsync(string token, string ipAddress);
+        Task<(User User, RefreshToken RefreshToken)> RefreshTokenAsync(string token, string ipAddress);
         
         /// <summary>
         /// Отзыв Refresh токена

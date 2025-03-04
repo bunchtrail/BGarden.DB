@@ -3,7 +3,7 @@
   - **Application**
     - `Application.csproj` (596.0 B)
     - **bin**
-    - `DependencyInjection.cs` (1.5 KB)
+    - `DependencyInjection.cs` (1.7 KB)
     - **DTO**
       - `AuthLogDto.cs` (1.9 KB)
       - `BiometryDto.cs` (1.2 KB)
@@ -45,35 +45,38 @@
       - `SpecimenService.cs` (2.7 KB)
       - `UserService.cs` (6.4 KB)
     - **UseCases**
-      - `AuthUseCase.cs` (19.6 KB)
+      - `AuthUseCase.cs` (20.3 KB)
       - `CreateSpecimenUseCase.cs` (2.2 KB)
       - **Interfaces**
-        - `IAuthUseCase.cs` (4.3 KB)
-  - `BGarden.DB.sln` (2.4 KB)
+        - `IAuthUseCase.cs` (4.4 KB)
+  - **backup**
+    - `IJwtService_backup.cs` (1.1 KB)
+  - `BGarden.DB.sln` (1.9 KB)
   - **docs**
-    - `Структура_BGarden-DB_от_04-03-2025.md` (4.5 KB)
+    - `Структура_BGarden-DB_от_04-03-2025.md` (4.8 KB)
   - **Domain**
     - **bin**
-    - `Domain.csproj` (320.0 B)
+    - `Domain.csproj` (404.0 B)
     - **Entities**
       - `AuthLog.cs` (1.9 KB)
       - `Biometry.cs` (1.4 KB)
       - `Exposition.cs` (936.0 B)
       - `Family.cs` (744.0 B)
       - `Phenology.cs` (1.5 KB)
-      - `RefreshToken.cs` (2.1 KB)
+      - `RefreshToken.cs` (2.8 KB)
       - `Region.cs` (2.5 KB)
       - `Specimen.cs` (7.2 KB)
-      - `User.cs` (3.3 KB)
+      - `User.cs` (3.5 KB)
     - **Enums**
-      - `AuthEventType.cs` (1.4 KB)
+      - `AuthEventType.cs` (2.0 KB)
       - `SectorType.cs` (251.0 B)
       - `UserRole.cs` (728.0 B)
     - **Interfaces**
-      - `IAuthService.cs` (3.5 KB)
+      - `IAuthService.cs` (3.4 KB)
       - `IBiometryRepository.cs` (692.0 B)
       - `IExpositionRepository.cs` (517.0 B)
       - `IFamilyRepository.cs` (512.0 B)
+      - `IJwtService.cs` (1.1 KB)
       - `IPhenologyRepository.cs` (751.0 B)
       - `IRegionRepository.cs` (1.5 KB)
       - `IRepository.cs` (584.0 B)
@@ -101,7 +104,7 @@
       - `ConnectionString.cs` (225.0 B)
       - `DesignTimeDbContextFactory.cs` (541.0 B)
       - **Migrations**
-    - `DependencyInjection.cs` (1.7 KB)
+    - `DependencyInjection.cs` (1.8 KB)
     - `Infrastructure.csproj` (1.7 KB)
     - **Migrations**
       - `20250302162821_init.cs` (9.6 KB)
@@ -116,7 +119,9 @@
       - `20250303094051_SecurityEnhancement.Designer.cs` (21.8 KB)
       - `20250303094948_v3.cs` (447.0 B)
       - `20250303094948_v3.Designer.cs` (21.8 KB)
-      - `BotanicalContextModelSnapshot.cs` (21.7 KB)
+      - `20250304170748_AddLastActiveAtColumn.cs` (1.8 KB)
+      - `20250304170748_AddLastActiveAtColumn.Designer.cs` (22.3 KB)
+      - `BotanicalContextModelSnapshot.cs` (22.2 KB)
       - `README.md` (1.6 KB)
     - **obj**
     - `Program.cs` (711.0 B)
@@ -132,4 +137,4 @@
       - `UnitOfWork.cs` (2.6 KB)
       - `UserRepository.cs` (1.9 KB)
     - **Services**
-      - `AuthService.cs` (20.9 KB)
+      - `AuthService.cs` (23.6 KB)

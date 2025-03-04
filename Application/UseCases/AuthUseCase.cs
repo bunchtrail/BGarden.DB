@@ -18,14 +18,19 @@ namespace BGarden.Application.UseCases
     public class AuthUseCase : IAuthUseCase
     {
         private readonly IAuthService _authService;
+        private readonly IJwtService _jwtService;
         private readonly ILogger<AuthUseCase> _logger;
 
         /// <summary>
         /// Конструктор сервиса авторизации
         /// </summary>
-        public AuthUseCase(IAuthService authService, ILogger<AuthUseCase> logger)
+        public AuthUseCase(
+            IAuthService authService, 
+            IJwtService jwtService,
+            ILogger<AuthUseCase> logger)
         {
             _authService = authService ?? throw new ArgumentNullException(nameof(authService));
+            _jwtService = jwtService ?? throw new ArgumentNullException(nameof(jwtService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -48,8 +53,8 @@ namespace BGarden.Application.UseCases
                 
                 _logger.LogInformation("Успешная регистрация пользователя {Username}", registerDto.Username);
                 
-                // Генерируем JWT токен
-                var jwtToken = await _authService.GenerateJwtTokenAsync(user);
+                // Генерируем JWT токен используя JwtService вместо AuthService
+                var jwtToken = _jwtService.GenerateJwtToken(user);
                 
                 // Генерируем refresh токен
                 var refreshToken = await _authService.GenerateRefreshTokenAsync(user, registerDto.IpAddress ?? "unknown");
@@ -99,57 +104,61 @@ namespace BGarden.Application.UseCases
                     };
                 }
                 
-                // Если требуется 2FA и предоставлен код
+                // Если включена 2FA, проверяем код
                 if (user.TwoFactorEnabled && !string.IsNullOrEmpty(loginDto.TwoFactorCode))
                 {
-                    var isValid = await _authService.VerifyTwoFactorCodeAsync(user.Id, loginDto.TwoFactorCode);
+                    bool isValid = await _authService.VerifyTwoFactorCodeAsync(user.Id, loginDto.TwoFactorCode);
                     if (!isValid)
                     {
                         _logger.LogWarning("Неверный код 2FA для пользователя {Username}", loginDto.Username);
-                        return null;
+                        throw new InvalidOperationException("Неверный код двухфакторной аутентификации");
                     }
                 }
                 
-                // Генерируем JWT токен
-                var jwtToken = await _authService.GenerateJwtTokenAsync(user);
-                var refreshToken = await _authService.GenerateRefreshTokenAsync(user, loginDto.IpAddress ?? "Unknown");
+                _logger.LogInformation("Успешный вход пользователя {Username}", loginDto.Username);
                 
-                // Определяем срок действия токена (1 час или 24 часа, если "запомнить меня")
-                var expiration = DateTime.UtcNow.AddMinutes(loginDto.RememberMe ? 1440 : 60);
+                // Генерируем JWT токен используя JwtService
+                var jwtToken = _jwtService.GenerateJwtToken(user);
                 
-                _logger.LogInformation("Пользователь {Username} успешно вошел в систему", loginDto.Username);
+                // Генерируем refresh токен
+                var refreshToken = await _authService.GenerateRefreshTokenAsync(user, loginDto.IpAddress ?? "unknown");
                 
-                return AuthMapper.CreateTokenDto(jwtToken, refreshToken, expiration, user.Username);
+                // Возвращаем токены
+                return AuthMapper.CreateTokenDto(
+                    jwtToken, 
+                    refreshToken, 
+                    DateTime.UtcNow.AddMinutes(15), // Время жизни токена
+                    user.Username
+                );
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Ошибка при попытке входа пользователя {Username}", loginDto.Username);
+                _logger.LogError(ex, "Ошибка при авторизации пользователя {Username}: {Message}", 
+                    loginDto.Username, ex.Message);
                 throw;
             }
         }
 
         /// <inheritdoc/>
-        public async Task<TokenDto> RefreshTokenAsync(RefreshTokenDto refreshTokenDto)
+        public async Task<TokenDto> RefreshTokenAsync(string token, string ipAddress)
         {
             try
             {
-                var (jwtToken, refreshToken) = await _authService.RefreshTokenAsync(
-                    refreshTokenDto.Token, 
-                    refreshTokenDto.IpAddress ?? "unknown"
+                var (user, refreshToken) = await _authService.RefreshTokenAsync(token, ipAddress);
+                
+                // Генерируем новый JWT токен
+                var jwtToken = _jwtService.GenerateJwtToken(user);
+                
+                return AuthMapper.CreateTokenDto(
+                    jwtToken,
+                    refreshToken,
+                    DateTime.UtcNow.AddMinutes(15), // Время жизни токена
+                    user.Username
                 );
-                
-                // Предполагаем, что токен действителен на 60 минут
-                DateTime expiration = DateTime.UtcNow.AddMinutes(60);
-                
-                var user = await _authService.GetUserByIdAsync(refreshToken.UserId);
-                
-                _logger.LogInformation("Токен доступа обновлен для пользователя {Username}", user?.Username);
-                
-                return AuthMapper.CreateTokenDto(jwtToken, refreshToken, expiration, user?.Username ?? "unknown");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Ошибка при обновлении токена");
+                _logger.LogError(ex, "Ошибка при обновлении токена: {Message}", ex.Message);
                 throw;
             }
         }
@@ -176,40 +185,47 @@ namespace BGarden.Application.UseCases
             try
             {
                 // Получаем пользователя по имени
-                var user = await _authService.GetUserByIdAsync(
-                    (await _authService.AuthenticateAsync(username, "dummy_password_not_used", null))?.Id ?? 0
-                );
+                var user = await _authService.GetUserByIdAsync(await GetUserIdFromUsername(username));
                 
-                if (user == null)
+                if (user == null || !user.IsActive)
                 {
-                    _logger.LogWarning("Пользователь {Username} не найден при проверке 2FA", username);
-                    throw new InvalidOperationException($"Пользователь {username} не найден");
+                    throw new InvalidOperationException("Пользователь не найден или заблокирован");
                 }
                 
-                // Проверяем код двухфакторной аутентификации
+                if (!user.TwoFactorEnabled)
+                {
+                    throw new InvalidOperationException("Двухфакторная аутентификация не включена для данного пользователя");
+                }
+                
+                // Проверяем код 2FA
                 bool isValid = await _authService.VerifyTwoFactorCodeAsync(user.Id, twoFactorCode);
                 if (!isValid)
                 {
-                    _logger.LogWarning("Неверный код двухфакторной аутентификации для пользователя {Username}", username);
                     throw new InvalidOperationException("Неверный код двухфакторной аутентификации");
                 }
                 
-                // Генерируем JWT токен
-                string jwtToken = await _authService.GenerateJwtTokenAsync(user);
+                // Генерируем JWT токен используя JwtService
+                var jwtToken = _jwtService.GenerateJwtToken(user);
                 
-                // Генерируем Refresh токен
-                var refreshToken = await _authService.GenerateRefreshTokenAsync(user, "unknown");
+                // Генерируем refresh токен
+                var refreshToken = await _authService.GenerateRefreshTokenAsync(user, "2FA Verification");
                 
-                // Определяем срок действия токена
-                DateTime expiration = DateTime.UtcNow.AddMinutes(rememberMe ? 1440 : 60); // 24 часа или 1 час
+                _logger.LogInformation("Пользователь {Username} прошел 2FA верификацию", username);
                 
-                _logger.LogInformation("Двухфакторная аутентификация успешно пройдена для пользователя {Username}", username);
+                // Срок действия по умолчанию 15 минут, увеличиваем если "запомнить меня"
+                var expiryTime = rememberMe ? DateTime.UtcNow.AddDays(1) : DateTime.UtcNow.AddMinutes(15);
                 
-                return AuthMapper.CreateTokenDto(jwtToken, refreshToken, expiration, user.Username);
+                return AuthMapper.CreateTokenDto(
+                    jwtToken, 
+                    refreshToken, 
+                    expiryTime,
+                    username
+                );
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Ошибка при проверке двухфакторной аутентификации для пользователя {Username}", username);
+                _logger.LogError(ex, "Ошибка при верификации 2FA для пользователя {Username}: {Message}", 
+                    username, ex.Message);
                 throw;
             }
         }
@@ -399,6 +415,16 @@ namespace BGarden.Application.UseCases
                    hasLowerCase.IsMatch(password) && 
                    hasDigit.IsMatch(password) && 
                    hasSpecialChar.IsMatch(password);
+        }
+
+        // Вспомогательный метод для получения ID пользователя по имени
+        private async Task<int> GetUserIdFromUsername(string username)
+        {
+            if (string.IsNullOrEmpty(username))
+                throw new ArgumentException("Имя пользователя не может быть пустым", nameof(username));
+                
+            var user = await _authService.AuthenticateAsync(username, "dummy_password_not_used", null);
+            return user?.Id ?? 0;
         }
     }
 } 

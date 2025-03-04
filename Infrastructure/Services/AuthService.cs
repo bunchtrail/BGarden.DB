@@ -4,32 +4,29 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using BGarden.Domain.Entities;
 using BGarden.Domain.Enums;
 using BGarden.Domain.Interfaces;
 using BGarden.Infrastructure.Data;
 using BCrypt.Net;
 using Google.Authenticator;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Configuration;
 
 namespace BGarden.Infrastructure.Services
 {
     public class AuthService : IAuthService
     {
         private readonly BotanicalContext _context;
-        private readonly string _jwtSecret = "YourSuperSecretKeyForBotanicalGardenApp-MustBeAtLeast32BytesLong"; // Должно совпадать с конфигурацией
-        private readonly string _issuer = "BGarden.API";
-        private readonly string _audience = "BGarden.Client";
-        private readonly int _jwtLifetimeMinutes = 15;
-        private readonly int _refreshTokenLifetimeDays = 7;
+        private readonly int _refreshTokenLifetimeDays;
         
-        public AuthService(BotanicalContext context)
+        public AuthService(BotanicalContext context, IConfiguration configuration)
         {
             _context = context;
+            
+            // Получение настроек из конфигурации (только для refresh токенов)
+            var jwtSettings = configuration.GetSection("JwtSettings");
+            _refreshTokenLifetimeDays = int.TryParse(jwtSettings["RefreshTokenExpiryDays"], out int refreshTokenDays) ? refreshTokenDays : 7;
         }
         
         public async Task<User?> AuthenticateAsync(string username, string password, string? ipAddress = null, string? userAgent = null)
@@ -264,34 +261,6 @@ namespace BGarden.Infrastructure.Services
             return false;
         }
         
-        public async Task<string> GenerateJwtTokenAsync(User user)
-        {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_jwtSecret);
-            
-            var claims = new List<Claim>
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-                new Claim(JwtRegisteredClaimNames.Name, user.Username),
-                new Claim(ClaimTypes.Name, user.Username), // Добавляем стандартный клейм для имени
-                new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                new Claim(ClaimTypes.Role, user.Role.ToString()),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            };
-            
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(claims, JwtBearerDefaults.AuthenticationScheme), // Указываем схему аутентификации
-                Expires = DateTime.UtcNow.AddMinutes(_jwtLifetimeMinutes),
-                Issuer = _issuer,
-                Audience = _audience,
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-            
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
-        }
-        
         public async Task<RefreshToken> GenerateRefreshTokenAsync(User user, string ipAddress)
         {
             var refreshToken = new RefreshToken
@@ -311,43 +280,69 @@ namespace BGarden.Infrastructure.Services
             return refreshToken;
         }
         
-        public async Task<(string JwtToken, RefreshToken RefreshToken)> RefreshTokenAsync(string token, string ipAddress)
+        public async Task<(User User, RefreshToken RefreshToken)> RefreshTokenAsync(string tokenValue, string ipAddress)
         {
             var refreshToken = await _context.RefreshTokens
                 .Include(r => r.User)
-                .SingleOrDefaultAsync(r => r.Token == token);
-                
-            if (refreshToken == null || !refreshToken.IsActive || refreshToken.User == null)
-                throw new InvalidOperationException("Недействительный токен обновления");
-                
-            // Создаем новый refresh token и отзываем старый
-            var newRefreshToken = new RefreshToken
+                .SingleOrDefaultAsync(r => r.Token == tokenValue);
+
+            // Проверка наличия токена
+            if (refreshToken == null)
             {
-                UserId = refreshToken.UserId,
-                Token = GenerateUniqueToken(),
-                ExpiryDate = DateTime.UtcNow.AddDays(_refreshTokenLifetimeDays),
-                CreatedAt = DateTime.UtcNow,
-                CreatedByIp = ipAddress,
-                IsRevoked = false
-            };
+                await LogAuthEventAsync(AuthEventType.InvalidRefreshToken, "Unknown", null, false, 
+                    "Попытка использовать несуществующий refresh token", ipAddress);
+                throw new InvalidOperationException("Невалидный refresh token");
+            }
+
+            // Проверка не отозван ли токен
+            if (refreshToken.Revoked != null)
+            {
+                // Отзываем все refresh токены для этого пользователя (семья токенов)
+                await RevokeDescendantRefreshTokensAsync(refreshToken, ipAddress, 
+                    $"Попытка использовать уже отозванный refresh token: {tokenValue}");
+                
+                await _context.SaveChangesAsync();
+                await LogAuthEventAsync(AuthEventType.RevokedRefreshToken, refreshToken.User.Username, refreshToken.User.Id, false, 
+                    "Попытка использовать уже отозванный refresh token", ipAddress);
+                
+                throw new InvalidOperationException("Невалидный refresh token");
+            }
+
+            // Проверка срока действия
+            if (refreshToken.ExpiryDate < DateTime.UtcNow)
+            {
+                refreshToken.Revoked = DateTime.UtcNow;
+                refreshToken.RevokedByIp = ipAddress;
+                refreshToken.ReasonRevoked = "Истек срок действия токена";
+                await _context.SaveChangesAsync();
+                
+                await LogAuthEventAsync(AuthEventType.ExpiredRefreshToken, refreshToken.User.Username, refreshToken.User.Id, false, 
+                    "Refresh token истек", ipAddress);
+                
+                throw new InvalidOperationException("Refresh token истек");
+            }
+
+            // Проверка пользователя
+            var user = refreshToken.User;
+            if (user == null || !user.IsActive)
+            {
+                await LogAuthEventAsync(AuthEventType.InvalidRefreshToken, user?.Username ?? "Unknown", user?.Id, false, 
+                    "Пользователь не активен или не найден", ipAddress);
+                
+                throw new InvalidOperationException("Невалидный refresh token");
+            }
+
+            // Создаем новый refresh token и заменяем старый
+            var newRefreshToken = await RotateRefreshTokenAsync(refreshToken, ipAddress);
             
-            // Отзываем старый токен
-            refreshToken.IsRevoked = true;
-            refreshToken.RevokedByIp = ipAddress;
-            refreshToken.ReplacedByToken = newRefreshToken.Token;
-            
-            // Сохраняем изменения
-            _context.RefreshTokens.Add(newRefreshToken);
-            _context.RefreshTokens.Update(refreshToken);
+            user.LastActiveAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
             
-            // Генерируем новый JWT
-            string jwtToken = await GenerateJwtTokenAsync(refreshToken.User);
+            await LogAuthEventAsync(AuthEventType.RefreshTokenSuccess, user.Username, user.Id, true, 
+                "Успешное обновление токена", ipAddress);
             
-            await LogAuthEventAsync(AuthEventType.Login, refreshToken.User.Username, refreshToken.User.Id, true, 
-                "Вход через Refresh Token", ipAddress);
-                
-            return (jwtToken, newRefreshToken);
+            // Возвращаем пользователя и новый токен
+            return (user, newRefreshToken);
         }
         
         public async Task RevokeTokenAsync(string token, string ipAddress)
@@ -484,6 +479,55 @@ namespace BGarden.Infrastructure.Services
             
             await _context.AuthLogs.AddAsync(authLog);
             await _context.SaveChangesAsync();
+        }
+        
+        // Приватный метод для создания нового refresh токена и отзыва старого
+        private async Task<RefreshToken> RotateRefreshTokenAsync(RefreshToken oldToken, string ipAddress)
+        {
+            // Создаем новый refresh token
+            var newRefreshToken = new RefreshToken
+            {
+                UserId = oldToken.UserId,
+                User = oldToken.User,
+                Token = GenerateUniqueToken(),
+                ExpiryDate = DateTime.UtcNow.AddDays(_refreshTokenLifetimeDays),
+                Created = DateTime.UtcNow,
+                CreatedByIp = ipAddress
+            };
+            
+            // Отзываем старый токен
+            oldToken.Revoked = DateTime.UtcNow;
+            oldToken.RevokedByIp = ipAddress;
+            oldToken.ReplacedByToken = newRefreshToken.Token;
+            oldToken.ReasonRevoked = "Заменен на новый токен";
+            
+            // Добавляем новый токен в базу
+            _context.RefreshTokens.Add(newRefreshToken);
+            _context.RefreshTokens.Update(oldToken);
+            
+            return newRefreshToken;
+        }
+        
+        // Отзыв всех дочерних refresh токенов
+        private async Task RevokeDescendantRefreshTokensAsync(RefreshToken refreshToken, string ipAddress, string reason)
+        {
+            // Рекурсивно отзываем все токены, которые заменили данный токен
+            if (!string.IsNullOrEmpty(refreshToken.ReplacedByToken))
+            {
+                var childToken = await _context.RefreshTokens.SingleOrDefaultAsync(r => 
+                    r.Token == refreshToken.ReplacedByToken);
+                    
+                if (childToken != null && childToken.Revoked == null)
+                {
+                    childToken.Revoked = DateTime.UtcNow;
+                    childToken.RevokedByIp = ipAddress;
+                    childToken.ReasonRevoked = reason;
+                    await _context.SaveChangesAsync();
+                    
+                    // Рекурсивно отзываем всех потомков
+                    await RevokeDescendantRefreshTokensAsync(childToken, ipAddress, reason);
+                }
+            }
         }
     }
 } 

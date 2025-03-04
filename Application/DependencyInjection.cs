@@ -7,6 +7,8 @@ using BGarden.Application.Interfaces;
 using BGarden.Application.Services;
 using BGarden.Application.UseCases;
 using BGarden.Application.UseCases.Interfaces;
+using BGarden.Domain.Interfaces;
+using System;
 
 namespace Application
 {
@@ -14,6 +16,9 @@ namespace Application
     {
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
+            if (services == null)
+                throw new ArgumentNullException(nameof(services));
+
             // Регистрируем сервисы
             services.AddScoped<ISpecimenService, SpecimenService>();
             services.AddScoped<IFamilyService, FamilyService>();
@@ -29,6 +34,8 @@ namespace Application
             
             // Регистрируем сервисы аутентификации
             services.AddScoped<IAuthUseCase, AuthUseCase>();
+            
+            // Примечание: IJwtService теперь регистрируется в API слое
             
             return services;
         }

@@ -60,6 +60,11 @@ namespace BGarden.Domain.Entities
         public DateTime? LastLogin { get; set; }
         
         /// <summary>
+        /// Дата последней активности пользователя
+        /// </summary>
+        public DateTime? LastActiveAt { get; set; }
+        
+        /// <summary>
         /// Активна ли учетная запись
         /// </summary>
         public bool IsActive { get; set; } = true;

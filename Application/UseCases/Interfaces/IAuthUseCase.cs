@@ -26,9 +26,10 @@ namespace BGarden.Application.UseCases.Interfaces
         /// <summary>
         /// Обновление токена доступа
         /// </summary>
-        /// <param name="refreshTokenDto">Токен обновления</param>
+        /// <param name="token">Токен обновления</param>
+        /// <param name="ipAddress">IP-адрес клиента</param>
         /// <returns>Новый токен доступа</returns>
-        Task<TokenDto> RefreshTokenAsync(RefreshTokenDto refreshTokenDto);
+        Task<TokenDto> RefreshTokenAsync(string token, string ipAddress);
         
         /// <summary>
         /// Выход пользователя из системы

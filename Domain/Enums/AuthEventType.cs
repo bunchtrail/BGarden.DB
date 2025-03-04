@@ -48,6 +48,26 @@ namespace BGarden.Domain.Enums
         /// <summary>
         /// Двухфакторная аутентификация
         /// </summary>
-        TwoFactorAuthentication = 9
+        TwoFactorAuthentication = 9,
+        
+        /// <summary>
+        /// Невалидный refresh token
+        /// </summary>
+        InvalidRefreshToken = 10,
+        
+        /// <summary>
+        /// Отозванный refresh token
+        /// </summary>
+        RevokedRefreshToken = 11,
+        
+        /// <summary>
+        /// Истекший refresh token
+        /// </summary>
+        ExpiredRefreshToken = 12,
+        
+        /// <summary>
+        /// Успешное обновление токена
+        /// </summary>
+        RefreshTokenSuccess = 13
     }
 } 
