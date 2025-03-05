@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using BGarden.Domain.Entities;
 using BGarden.Domain.Interfaces;
 using BGarden.Infrastructure.Data;
+using BGarden.Domain.Enums;
 
 namespace BGarden.Infrastructure.Repositories
 {
@@ -33,6 +34,16 @@ namespace BGarden.Infrastructure.Repositories
         {
             return await _dbSet
                 .Where(x => x.RegionId == regionId)
+                .Include(s => s.Family)
+                .Include(s => s.Exposition)
+                .ToListAsync();
+        }
+
+        /// <inheritdoc/>
+        public async Task<IEnumerable<Specimen>> GetSpecimensBySectorTypeAsync(SectorType sectorType)
+        {
+            return await _dbSet
+                .Where(x => x.SectorType == sectorType)
                 .Include(s => s.Family)
                 .Include(s => s.Exposition)
                 .ToListAsync();

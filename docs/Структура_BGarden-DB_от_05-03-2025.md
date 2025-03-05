@@ -1,5 +1,7 @@
 - **BGarden.DB**
   - **.vs**
+  - `add-specimens.cmd` (548.0 B)
+  - `add-specimens.ps1` (847.0 B)
   - **Application**
     - `Application.csproj` (596.0 B)
     - **bin**
@@ -24,7 +26,7 @@
       - `IFamilyService.cs` (1.5 KB)
       - `IPhenologyService.cs` (2.6 KB)
       - `IRegionService.cs` (2.3 KB)
-      - `ISpecimenService.cs` (1.3 KB)
+      - `ISpecimenService.cs` (1.8 KB)
       - `IUserService.cs` (2.0 KB)
     - **Mappers**
       - `AuthMapper.cs` (3.3 KB)
@@ -42,7 +44,7 @@
       - `FamilyService.cs` (2.3 KB)
       - `PhenologyService.cs` (3.3 KB)
       - `RegionService.cs` (3.8 KB)
-      - `SpecimenService.cs` (2.7 KB)
+      - `SpecimenService.cs` (3.1 KB)
       - `UserService.cs` (6.4 KB)
     - **UseCases**
       - `AuthUseCase.cs` (20.3 KB)
@@ -53,7 +55,7 @@
     - `IJwtService_backup.cs` (1.1 KB)
   - `BGarden.DB.sln` (1.9 KB)
   - **docs**
-    - `Структура_BGarden-DB_от_04-03-2025.md` (4.8 KB)
+    - `Структура_BGarden-DB_от_05-03-2025.md` (5.1 KB)
   - **Domain**
     - **bin**
     - `Domain.csproj` (404.0 B)
@@ -69,7 +71,7 @@
       - `User.cs` (3.5 KB)
     - **Enums**
       - `AuthEventType.cs` (2.0 KB)
-      - `SectorType.cs` (251.0 B)
+      - `SectorType.cs` (147.0 B)
       - `UserRole.cs` (728.0 B)
     - **Interfaces**
       - `IAuthService.cs` (3.4 KB)
@@ -80,7 +82,7 @@
       - `IPhenologyRepository.cs` (751.0 B)
       - `IRegionRepository.cs` (1.5 KB)
       - `IRepository.cs` (584.0 B)
-      - `ISpecimenRepository.cs` (1014.0 B)
+      - `ISpecimenRepository.cs` (1.5 KB)
       - `IUnitOfWork.cs` (962.0 B)
       - `IUserRepository.cs` (1.2 KB)
     - **obj**
@@ -89,6 +91,7 @@
   - `ef-commands.cmd` (2.5 KB)
   - **Infrastructure**
     - **bin**
+    - `ConsoleDbInitializer.cs` (3.3 KB)
     - **Data**
       - `BotanicalContext.cs` (1.9 KB)
       - **Configurations**
@@ -102,10 +105,14 @@
         - `SpecimenConfiguration.cs` (5.4 KB)
         - `UserConfiguration.cs` (2.8 KB)
       - `ConnectionString.cs` (225.0 B)
+      - `DbInitializer.cs` (11.5 KB)
       - `DesignTimeDbContextFactory.cs` (541.0 B)
       - **Migrations**
+      - `SpecimenSeeder.cs` (16.9 KB)
     - `DependencyInjection.cs` (1.8 KB)
-    - `Infrastructure.csproj` (1.7 KB)
+    - **Extensions**
+      - `DbInitializationExtensions.cs` (3.1 KB)
+    - `Infrastructure.csproj` (1.8 KB)
     - **Migrations**
       - `20250302162821_init.cs` (9.6 KB)
       - `20250302162821_init.Designer.cs` (11.1 KB)
@@ -124,7 +131,7 @@
       - `BotanicalContextModelSnapshot.cs` (22.2 KB)
       - `README.md` (1.6 KB)
     - **obj**
-    - `Program.cs` (711.0 B)
+    - `Program.cs` (2.9 KB)
     - **Repositories**
       - `BiometryRepository.cs` (1.6 KB)
       - `ExpositionRepository.cs` (876.0 B)
@@ -133,8 +140,10 @@
       - `README.md` (2.9 KB)
       - `RegionRepository.cs` (6.3 KB)
       - `RepositoryBase.cs` (1.3 KB)
-      - `SpecimenRepository.cs` (1.8 KB)
+      - `SpecimenRepository.cs` (2.2 KB)
       - `UnitOfWork.cs` (2.6 KB)
       - `UserRepository.cs` (1.9 KB)
     - **Services**
       - `AuthService.cs` (23.6 KB)
+    - `SpecimenInitializer.cs` (3.1 KB)
+  - `initialize-db.cmd` (450.0 B)

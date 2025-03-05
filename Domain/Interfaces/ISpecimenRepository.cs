@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using BGarden.Domain.Entities;
+using BGarden.Domain.Enums;
 
 namespace BGarden.Domain.Interfaces
 {
@@ -17,5 +18,12 @@ namespace BGarden.Domain.Interfaces
         /// <param name="regionId">Идентификатор региона</param>
         /// <returns>Коллекция образцов, расположенных в данном регионе</returns>
         Task<IEnumerable<Specimen>> GetSpecimensByRegionIdAsync(int regionId);
+
+        /// <summary>
+        /// Получает все образцы, принадлежащие указанному типу сектора.
+        /// </summary>
+        /// <param name="sectorType">Тип сектора (дендрология, флора, цветоводство)</param>
+        /// <returns>Коллекция образцов, относящихся к указанному типу сектора</returns>
+        Task<IEnumerable<Specimen>> GetSpecimensBySectorTypeAsync(SectorType sectorType);
     }
 } 

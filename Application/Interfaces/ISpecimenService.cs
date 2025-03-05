@@ -1,4 +1,5 @@
 using Application.DTO;
+using BGarden.Domain.Enums;
 
 namespace Application.Interfaces
 {
@@ -31,5 +32,12 @@ namespace Application.Interfaces
         /// Удалить Specimen по Id, вернёт true, если успешно.
         /// </summary>
         Task<bool> DeleteSpecimenAsync(int id);
+
+        /// <summary>
+        /// Получить все образцы, принадлежащие указанному типу сектора.
+        /// </summary>
+        /// <param name="sectorType">Тип сектора (дендрология, флора, цветоводство)</param>
+        /// <returns>Коллекция образцов, относящихся к указанному типу сектора</returns>
+        Task<IEnumerable<SpecimenDto>> GetSpecimensBySectorTypeAsync(SectorType sectorType);
     }
 } 

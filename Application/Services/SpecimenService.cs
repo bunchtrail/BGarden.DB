@@ -3,6 +3,7 @@ using Application.Interfaces;
 using Application.Mappers;
 using BGarden.Domain.Entities;
 using BGarden.Domain.Interfaces;
+using BGarden.Domain.Enums;
 
 namespace Application.Services
 {
@@ -72,6 +73,12 @@ namespace Application.Services
             await _unitOfWork.SaveChangesAsync();
 
             return true;
+        }
+
+        public async Task<IEnumerable<SpecimenDto>> GetSpecimensBySectorTypeAsync(SectorType sectorType)
+        {
+            var specimens = await _unitOfWork.Specimens.GetSpecimensBySectorTypeAsync(sectorType);
+            return specimens.Select(s => s.ToDto()).ToList();
         }
     }
 } 

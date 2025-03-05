@@ -5,6 +5,5 @@ namespace BGarden.Domain.Enums
         Dendrology = 0,
         Flora = 1,
         Flowering = 2
-        // при необходимости можно добавить другие значения
     }
 } 
