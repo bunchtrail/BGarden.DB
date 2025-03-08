@@ -42,24 +42,33 @@ namespace BGarden.Infrastructure.Data.Configurations
             // Игнорируем пространственное поле Location в базе данных
             builder.Ignore(r => r.Location);
 
+            // Добавляем поле для координат полигона
+            builder.Property(r => r.PolygonCoordinates)
+                   .HasColumnType("text");
+
+            // Поля для стилизации полигона
+            builder.Property(r => r.StrokeColor)
+                   .HasMaxLength(50);
+
+            builder.Property(r => r.FillColor)
+                   .HasMaxLength(50);
+
+            builder.Property(r => r.FillOpacity)
+                   .HasColumnType("decimal(3,2)");
+
             // Индекс для ускорения поиска по координатам
             builder.HasIndex(r => new { r.Latitude, r.Longitude })
                    .HasDatabaseName("IX_Region_Coordinates");
 
-            // Убираем пространственный индекс для поля Location
-            // builder.HasIndex(r => r.Location)
-            //        .HasMethod("SPATIAL")
-            //        .HasDatabaseName("IX_Region_Location_Spatial");
-
-            // Необязательные поля
-            builder.Property(r => r.Radius)
-                   .HasColumnType("decimal(9,2)");
-
-            builder.Property(r => r.BoundaryWkt)
-                   .HasColumnType("text");
-
             // Игнорируем поле Boundary в базе данных
             builder.Ignore(r => r.Boundary);
+
+            // Даты создания и обновления
+            builder.Property(r => r.CreatedAt)
+                   .IsRequired();
+
+            builder.Property(r => r.UpdatedAt)
+                   .IsRequired();
 
             // Связь с Specimen - одна область может содержать много растений
             builder.HasMany(r => r.Specimens)

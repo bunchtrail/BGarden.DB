@@ -37,22 +37,28 @@ namespace BGarden.DB.Domain.Entities
         /// <summary>
         /// Описание маркера (опциональное)
         /// </summary>
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         /// <summary>
-        /// HTML-контент для всплывающего окна маркера (опциональный)
+        /// Идентификатор экземпляра растения
+        /// Это обязательное поле, так как маркер всегда привязан к растению
         /// </summary>
-        public string PopupContent { get; set; }
-
-        /// <summary>
-        /// Идентификатор экземпляра растения (опциональный)
-        /// </summary>
-        public int? SpecimenId { get; set; }
+        public int SpecimenId { get; set; }
 
         /// <summary>
         /// Связанный экземпляр растения
         /// </summary>
         public Specimen Specimen { get; set; }
+
+        /// <summary>
+        /// Идентификатор региона, в котором находится маркер
+        /// </summary>
+        public int? RegionId { get; set; }
+
+        /// <summary>
+        /// Связанный регион
+        /// </summary>
+        public Region? Region { get; set; }
 
         /// <summary>
         /// Дата создания маркера

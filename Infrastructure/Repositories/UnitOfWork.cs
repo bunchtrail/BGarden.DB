@@ -18,8 +18,6 @@ namespace BGarden.Infrastructure.Repositories
         private readonly IUserRepository _userRepository;
         private readonly IMapMarkerRepository _mapMarkerRepository;
         private readonly IMapOptionsRepository _mapOptionsRepository;
-        private readonly IMapLayerRepository _mapLayerRepository;
-        private readonly IMapAreaRepository _mapAreaRepository;
         private bool _disposed = false;
 
         public UnitOfWork(
@@ -32,9 +30,7 @@ namespace BGarden.Infrastructure.Repositories
             IRegionRepository regionRepository,
             IUserRepository userRepository,
             IMapMarkerRepository mapMarkerRepository,
-            IMapOptionsRepository mapOptionsRepository,
-            IMapLayerRepository mapLayerRepository,
-            IMapAreaRepository mapAreaRepository)
+            IMapOptionsRepository mapOptionsRepository)
         {
             _context = context;
             _specimenRepository = specimenRepository;
@@ -46,8 +42,6 @@ namespace BGarden.Infrastructure.Repositories
             _userRepository = userRepository;
             _mapMarkerRepository = mapMarkerRepository;
             _mapOptionsRepository = mapOptionsRepository;
-            _mapLayerRepository = mapLayerRepository;
-            _mapAreaRepository = mapAreaRepository;
         }
 
         public ISpecimenRepository Specimens => _specimenRepository;
@@ -59,8 +53,6 @@ namespace BGarden.Infrastructure.Repositories
         public IUserRepository Users => _userRepository;
         public IMapMarkerRepository MapMarkers => _mapMarkerRepository;
         public IMapOptionsRepository MapOptions => _mapOptionsRepository;
-        public IMapLayerRepository MapLayers => _mapLayerRepository;
-        public IMapAreaRepository MapAreas => _mapAreaRepository;
 
         public async Task<int> SaveChangesAsync()
         {

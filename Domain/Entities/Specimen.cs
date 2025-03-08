@@ -1,5 +1,7 @@
 using NetTopologySuite.Geometries;
 using System;
+using System.Collections.Generic;
+using BGarden.DB.Domain.Entities;
 
 namespace BGarden.Domain.Entities
 {
@@ -37,6 +39,11 @@ namespace BGarden.Domain.Entities
         /// Геометрическая точка, представляющая местоположение растения
         /// </summary>
         public Point? Location { get; set; }
+
+        /// <summary>
+        /// Маркер на карте, связанный с этим растением
+        /// </summary>
+        public MapMarker MapMarker { get; set; }
 
         /// <summary>
         /// Идентификатор области, в которой находится растение.
@@ -137,8 +144,6 @@ namespace BGarden.Domain.Entities
 
         /// <summary>
         /// Информация о наличии дубликатов в других гербариях.
-        /// Можно сделать отдельное булево поле,
-        /// но в описании фигурирует как текстовое.
         /// </summary>
         public string? DuplicatesInfo { get; set; }
 

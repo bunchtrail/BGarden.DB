@@ -8,6 +8,8 @@ using BGarden.Domain.Interfaces;
 using BGarden.Domain.Enums;
 using BGarden.Infrastructure.Data;
 using NetTopologySuite.Geometries;
+using NetTopologySuite.IO;
+using Newtonsoft.Json;
 
 namespace BGarden.Infrastructure.Repositories
 {
@@ -65,6 +67,81 @@ namespace BGarden.Infrastructure.Repositories
             {
                 // Если не удалось создать точку, используем старый метод поиска
                 return await FindNearbyRegionsLegacyAsync(latitude, longitude, radiusInMeters);
+            }
+        }
+
+        public async Task<bool> IsPointInRegionAsync(int regionId, decimal latitude, decimal longitude)
+        {
+            // Создаем точку из координат
+            var point = CreatePoint(longitude, latitude);
+            if (point == null) return false;
+
+            // Получаем регион
+            var region = await _context.Regions
+                .FirstOrDefaultAsync(r => r.Id == regionId);
+                
+            if (region == null || string.IsNullOrEmpty(region.PolygonCoordinates)) 
+                return false;
+                
+            try
+            {
+                // Создаем полигон из координат
+                var polygon = CreatePolygonFromCoordinates(region.PolygonCoordinates);
+                if (polygon == null) return false;
+                
+                // Проверяем, находится ли точка внутри полигона
+                return polygon.Contains(point);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        public async Task<IEnumerable<Specimen>> GetSpecimensInRegionAsync(int regionId)
+        {
+            return await _context.Specimens
+                .Where(s => s.RegionId == regionId)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+        
+        public async Task UpdateRegionPolygonAsync(int regionId, string polygonCoordinates, string? strokeColor = null, string? fillColor = null, decimal? fillOpacity = null)
+        {
+            var region = await _context.Regions
+                .FirstOrDefaultAsync(r => r.Id == regionId);
+                
+            if (region != null)
+            {
+                region.PolygonCoordinates = polygonCoordinates;
+                
+                if (!string.IsNullOrEmpty(strokeColor))
+                    region.StrokeColor = strokeColor;
+                    
+                if (!string.IsNullOrEmpty(fillColor))
+                    region.FillColor = fillColor;
+                    
+                if (fillOpacity.HasValue)
+                    region.FillOpacity = fillOpacity;
+                    
+                region.UpdatedAt = DateTime.UtcNow;
+                
+                try
+                {
+                    // Попытка создать полигон для проверки корректности координат
+                    var polygon = CreatePolygonFromCoordinates(polygonCoordinates);
+                    if (polygon != null)
+                    {
+                        // Преобразуем полигон в WKT и сохраняем в Boundary
+                        region.Boundary = polygon;
+                    }
+                }
+                catch (Exception)
+                {
+                    // Если координаты некорректны, оставляем только текстовое представление
+                }
+                
+                await _context.SaveChangesAsync();
             }
         }
 
@@ -135,6 +212,41 @@ namespace BGarden.Infrastructure.Repositories
             catch (Exception)
             {
                 // В случае ошибки возвращаем null
+                return null;
+            }
+        }
+        
+        /// <summary>
+        /// Создает полигон из строки координат в формате GeoJSON
+        /// </summary>
+        private Polygon? CreatePolygonFromCoordinates(string coordinatesJson)
+        {
+            try
+            {
+                // Парсим массив координат формата [[lon1,lat1],[lon2,lat2],...]
+                var coordinates = JsonConvert.DeserializeObject<double[][]>(coordinatesJson);
+                if (coordinates == null || coordinates.Length < 3) 
+                    return null;
+                
+                // Создаем координаты для полигона
+                var points = coordinates.Select(c => new Coordinate(c[0], c[1])).ToArray();
+                
+                // Для полигона последняя точка должна совпадать с первой
+                if (!points.First().Equals2D(points.Last()))
+                {
+                    var newPoints = new Coordinate[points.Length + 1];
+                    Array.Copy(points, newPoints, points.Length);
+                    newPoints[points.Length] = points[0];
+                    points = newPoints;
+                }
+                
+                // Создаем полигон
+                var factory = new GeometryFactory(new PrecisionModel(), 4326);
+                var ring = factory.CreateLinearRing(points);
+                return factory.CreatePolygon(ring);
+            }
+            catch (Exception)
+            {
                 return null;
             }
         }

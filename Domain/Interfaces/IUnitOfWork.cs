@@ -21,12 +21,6 @@ namespace BGarden.Domain.Interfaces
         // Репозитории для модуля карты
         IMapMarkerRepository MapMarkers { get; }
         IMapOptionsRepository MapOptions { get; }
-        IMapLayerRepository MapLayers { get; }
-        IMapAreaRepository MapAreas { get; }
-
-        // Здесь можно добавить другие репозитории по мере необходимости
-        // IFamilyRepository Families { get; }
-        // IExpositionRepository Expositions { get; }
 
         Task<int> SaveChangesAsync();
     }

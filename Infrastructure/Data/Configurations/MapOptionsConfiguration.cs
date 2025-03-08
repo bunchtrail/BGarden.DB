@@ -16,18 +16,44 @@ namespace BGarden.DB.Infrastructure.Data.Configurations
             builder.HasKey(o => o.Id);
 
             // Основные свойства
-            builder.Property(o => o.Name).IsRequired().HasMaxLength(100);
-            builder.Property(o => o.CenterLatitude).IsRequired();
-            builder.Property(o => o.CenterLongitude).IsRequired();
-            builder.Property(o => o.Zoom).IsRequired();
-            builder.Property(o => o.IsDefault).IsRequired().HasDefaultValue(false);
+            builder.Property(o => o.Name)
+                  .IsRequired()
+                  .HasMaxLength(100);
 
-            // Индекс для быстрого поиска настроек по умолчанию
-            builder.HasIndex(o => o.IsDefault);
+            builder.Property(o => o.CenterLatitude)
+                  .IsRequired();
+
+            builder.Property(o => o.CenterLongitude)
+                  .IsRequired();
+
+            builder.Property(o => o.DefaultZoom)
+                  .IsRequired();
+
+            builder.Property(o => o.MinZoom)
+                  .IsRequired();
+
+            builder.Property(o => o.MaxZoom)
+                  .IsRequired();
+
+            builder.Property(o => o.MapSchemaUrl)
+                  .IsRequired()
+                  .HasMaxLength(255);
+
+            builder.Property(o => o.IsDefault)
+                  .IsRequired()
+                  .HasDefaultValue(false);
 
             // Дата создания и обновления
-            builder.Property(o => o.CreatedAt).IsRequired();
-            builder.Property(o => o.UpdatedAt).IsRequired();
+            builder.Property(o => o.CreatedAt)
+                  .IsRequired();
+
+            builder.Property(o => o.UpdatedAt)
+                  .IsRequired();
+
+            // Гарантия, что только одна конфигурация будет по умолчанию
+            builder.HasIndex(o => o.IsDefault)
+                  .HasFilter("\"IsDefault\" = TRUE")
+                  .IsUnique();
         }
     }
 } 

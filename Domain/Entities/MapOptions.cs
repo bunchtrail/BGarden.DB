@@ -3,7 +3,7 @@ using System;
 namespace BGarden.DB.Domain.Entities
 {
     /// <summary>
-    /// Настройки карты ботанического сада
+    /// Базовые настройки карты ботанического сада для Leaflet
     /// </summary>
     public class MapOptions
     {
@@ -18,49 +18,34 @@ namespace BGarden.DB.Domain.Entities
         public string Name { get; set; }
 
         /// <summary>
-        /// Широта центра карты
+        /// Широта центра карты по умолчанию
         /// </summary>
         public double CenterLatitude { get; set; }
 
         /// <summary>
-        /// Долгота центра карты
+        /// Долгота центра карты по умолчанию
         /// </summary>
         public double CenterLongitude { get; set; }
 
         /// <summary>
-        /// Уровень масштабирования
+        /// Уровень масштабирования по умолчанию
         /// </summary>
-        public int Zoom { get; set; }
+        public int DefaultZoom { get; set; }
 
         /// <summary>
         /// Минимальный уровень масштабирования
         /// </summary>
-        public int? MinZoom { get; set; }
+        public int MinZoom { get; set; } = 1;
 
         /// <summary>
         /// Максимальный уровень масштабирования
         /// </summary>
-        public int? MaxZoom { get; set; }
+        public int MaxZoom { get; set; } = 18;
 
         /// <summary>
-        /// Южная граница (опционально)
+        /// Путь к файлу схемы карты
         /// </summary>
-        public double? SouthBound { get; set; }
-
-        /// <summary>
-        /// Западная граница (опционально)
-        /// </summary>
-        public double? WestBound { get; set; }
-
-        /// <summary>
-        /// Северная граница (опционально)
-        /// </summary>
-        public double? NorthBound { get; set; }
-
-        /// <summary>
-        /// Восточная граница (опционально)
-        /// </summary>
-        public double? EastBound { get; set; }
+        public string MapSchemaUrl { get; set; }
 
         /// <summary>
         /// Указывает, является ли эта конфигурация активной по умолчанию

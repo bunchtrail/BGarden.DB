@@ -1,5 +1,6 @@
 using System;
 using BGarden.DB.Domain.Entities;
+using BGarden.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -21,12 +22,17 @@ namespace BGarden.DB.Infrastructure.Data.Configurations
             builder.Property(m => m.Latitude).IsRequired();
             builder.Property(m => m.Longitude).IsRequired();
             builder.Property(m => m.Description).HasMaxLength(500);
-            builder.Property(m => m.PopupContent).HasMaxLength(2000);
             
-            // Отношение с экземпляром растения (один-ко-многим)
+            // Отношение с экземпляром растения (один-к-одному)
             builder.HasOne(m => m.Specimen)
+                   .WithOne(s => s.MapMarker)
+                   .HasForeignKey<MapMarker>(m => m.SpecimenId)
+                   .OnDelete(DeleteBehavior.Cascade);
+                   
+            // Отношение с регионом (много-к-одному)
+            builder.HasOne<Region>()
                    .WithMany()
-                   .HasForeignKey(m => m.SpecimenId)
+                   .HasForeignKey(m => m.RegionId)
                    .OnDelete(DeleteBehavior.SetNull);
 
             // Дата создания и обновления

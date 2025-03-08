@@ -34,5 +34,20 @@ namespace BGarden.Domain.Interfaces
         /// Найти ближайшие области к заданным координатам в пределах указанного радиуса (в метрах)
         /// </summary>
         Task<IEnumerable<Region>> FindNearbyRegionsAsync(decimal latitude, decimal longitude, decimal radiusInMeters);
+
+        /// <summary>
+        /// Проверить, находится ли точка внутри полигона области
+        /// </summary>
+        Task<bool> IsPointInRegionAsync(int regionId, decimal latitude, decimal longitude);
+
+        /// <summary>
+        /// Получить все растения, находящиеся в указанной области
+        /// </summary>
+        Task<IEnumerable<Specimen>> GetSpecimensInRegionAsync(int regionId);
+        
+        /// <summary>
+        /// Обновить полигон области
+        /// </summary>
+        Task UpdateRegionPolygonAsync(int regionId, string polygonCoordinates, string? strokeColor = null, string? fillColor = null, decimal? fillOpacity = null);
     }
 } 

@@ -56,9 +56,40 @@ namespace BGarden.Domain.Entities
         public Polygon? Boundary { get; set; }
 
         /// <summary>
+        /// Список координат для построения полигона в формате GeoJSON
+        /// Пример: [[lon1,lat1],[lon2,lat2],[lon3,lat3],[lon1,lat1]]
+        /// </summary>
+        public string? PolygonCoordinates { get; set; }
+
+        /// <summary>
+        /// Цвет границы области в формате HEX или RGBA
+        /// </summary>
+        public string? StrokeColor { get; set; }
+
+        /// <summary>
+        /// Цвет заливки области в формате HEX или RGBA
+        /// </summary>
+        public string? FillColor { get; set; }
+
+        /// <summary>
+        /// Прозрачность заливки (от 0 до 1)
+        /// </summary>
+        public decimal? FillOpacity { get; set; }
+
+        /// <summary>
         /// Тип сектора, к которому относится область
         /// </summary>
         public BGarden.Domain.Enums.SectorType SectorType { get; set; }
+
+        /// <summary>
+        /// Дата создания области
+        /// </summary>
+        public DateTime CreatedAt { get; set; }
+
+        /// <summary>
+        /// Дата последнего обновления области
+        /// </summary>
+        public DateTime UpdatedAt { get; set; }
 
         /// <summary>
         /// Образцы растений в данной области
