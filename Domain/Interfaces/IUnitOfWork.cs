@@ -1,3 +1,4 @@
+using BGarden.DB.Domain.Interfaces;
 using System;
 using System.Threading.Tasks;
 
@@ -16,6 +17,12 @@ namespace BGarden.Domain.Interfaces
         IPhenologyRepository Phenologies { get; }
         IRegionRepository Regions { get; }
         IUserRepository Users { get; }
+        
+        // Репозитории для модуля карты
+        IMapMarkerRepository MapMarkers { get; }
+        IMapOptionsRepository MapOptions { get; }
+        IMapLayerRepository MapLayers { get; }
+        IMapAreaRepository MapAreas { get; }
 
         // Здесь можно добавить другие репозитории по мере необходимости
         // IFamilyRepository Families { get; }

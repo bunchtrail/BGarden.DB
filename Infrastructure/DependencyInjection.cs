@@ -5,6 +5,8 @@ using BGarden.Domain.Interfaces;
 using BGarden.Infrastructure.Data;
 using BGarden.Infrastructure.Repositories;
 using BGarden.Infrastructure.Services;
+using BGarden.DB.Domain.Interfaces;
+using BGarden.DB.Infrastructure.Repositories;
 
 namespace BGarden.Infrastructure
 {
@@ -26,6 +28,12 @@ namespace BGarden.Infrastructure
             services.AddScoped<IPhenologyRepository, PhenologyRepository>();
             services.AddScoped<IRegionRepository, RegionRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
+            
+            // Регистрируем репозитории для модуля карты
+            services.AddScoped<IMapMarkerRepository, MapMarkerRepository>();
+            services.AddScoped<IMapOptionsRepository, MapOptionsRepository>();
+            services.AddScoped<IMapLayerRepository, MapLayerRepository>();
+            services.AddScoped<IMapAreaRepository, MapAreaRepository>();
 
             // Регистрируем UnitOfWork
             services.AddScoped<IUnitOfWork, UnitOfWork>();
