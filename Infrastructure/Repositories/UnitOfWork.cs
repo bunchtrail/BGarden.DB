@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using BGarden.DB.Domain.Interfaces;
+
 using BGarden.Domain.Interfaces;
 using BGarden.Infrastructure.Data;
 
@@ -16,10 +16,6 @@ namespace BGarden.Infrastructure.Repositories
         private readonly IPhenologyRepository _phenologyRepository;
         private readonly IRegionRepository _regionRepository;
         private readonly IUserRepository _userRepository;
-        private readonly IMapMarkerRepository _mapMarkerRepository;
-        private readonly IMapOptionsRepository _mapOptionsRepository;
-        private readonly IMapLayerRepository _mapLayerRepository;
-        private readonly IMapTileMetadataRepository _mapTileMetadataRepository;
         private bool _disposed = false;
 
         public UnitOfWork(
@@ -30,11 +26,7 @@ namespace BGarden.Infrastructure.Repositories
             IBiometryRepository biometryRepository,
             IPhenologyRepository phenologyRepository,
             IRegionRepository regionRepository,
-            IUserRepository userRepository,
-            IMapMarkerRepository mapMarkerRepository,
-            IMapOptionsRepository mapOptionsRepository,
-            IMapLayerRepository mapLayerRepository,
-            IMapTileMetadataRepository mapTileMetadataRepository)
+            IUserRepository userRepository)
         {
             _context = context;
             _specimenRepository = specimenRepository;
@@ -44,10 +36,6 @@ namespace BGarden.Infrastructure.Repositories
             _phenologyRepository = phenologyRepository;
             _regionRepository = regionRepository;
             _userRepository = userRepository;
-            _mapMarkerRepository = mapMarkerRepository;
-            _mapOptionsRepository = mapOptionsRepository;
-            _mapLayerRepository = mapLayerRepository;
-            _mapTileMetadataRepository = mapTileMetadataRepository;
         }
 
         public ISpecimenRepository Specimens => _specimenRepository;
@@ -57,10 +45,6 @@ namespace BGarden.Infrastructure.Repositories
         public IPhenologyRepository Phenologies => _phenologyRepository;
         public IRegionRepository Regions => _regionRepository;
         public IUserRepository Users => _userRepository;
-        public IMapMarkerRepository MapMarkers => _mapMarkerRepository;
-        public IMapOptionsRepository MapOptions => _mapOptionsRepository;
-        public IMapLayerRepository MapLayers => _mapLayerRepository;
-        public IMapTileMetadataRepository MapTileMetadata => _mapTileMetadataRepository;
 
         public async Task<int> SaveChangesAsync()
         {

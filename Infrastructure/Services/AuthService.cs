@@ -237,8 +237,6 @@ namespace BGarden.Infrastructure.Services
                     case "EditPlants":
                     case "AddPlants":
                     case "DeletePlants":
-                    case "ViewMap":
-                    case "EditMap":
                         return true;
                     default:
                         return false;
@@ -251,7 +249,6 @@ namespace BGarden.Infrastructure.Services
                 switch (operation)
                 {
                     case "ViewPlants":
-                    case "ViewMap":
                         return true;
                     default:
                         return false;

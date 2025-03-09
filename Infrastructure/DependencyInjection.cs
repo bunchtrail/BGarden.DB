@@ -5,8 +5,7 @@ using BGarden.Domain.Interfaces;
 using BGarden.Infrastructure.Data;
 using BGarden.Infrastructure.Repositories;
 using BGarden.Infrastructure.Services;
-using BGarden.DB.Domain.Interfaces;
-using BGarden.DB.Infrastructure.Repositories;
+
 using Microsoft.Extensions.Logging;
 
 namespace BGarden.Infrastructure
@@ -41,12 +40,6 @@ namespace BGarden.Infrastructure
             services.AddScoped<IRegionRepository, RegionRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             
-            // Репозитории для модуля карты
-            services.AddScoped<IMapMarkerRepository, MapMarkerRepository>();
-            services.AddScoped<IMapOptionsRepository, MapOptionsRepository>();
-            services.AddScoped<IMapLayerRepository, MapLayerRepository>();
-            services.AddScoped<IMapTileMetadataRepository, MapTileMetadataRepository>();
-
             // Регистрируем декораторы с кэшированием
             services.AddScoped<ISpecimenRepository>(provider => new CachedSpecimenRepository(
                 provider.GetRequiredService<SpecimenRepository>(),

@@ -9,9 +9,6 @@ using BGarden.Application.UseCases;
 using BGarden.Application.UseCases.Interfaces;
 using BGarden.Domain.Interfaces;
 using System;
-using Application.Interfaces.Map;
-using BGarden.Application.Services.Map;
-using Application.Services.Map;
 
 namespace BGarden.Application
 {
@@ -36,10 +33,6 @@ namespace BGarden.Application
             services.AddScoped<IPhenologyService, PhenologyService>();
             services.AddScoped<IBiometryService, BiometryService>();
             services.AddScoped<IRegionService, RegionService>();
-            
-            // Сервисы для работы с картой
-            services.AddScoped<IMapService, MapService>();
-            services.AddScoped<IMapTileService, MapTileService>();
 
             // Регистрация вариантов использования
             services.AddScoped<IAuthUseCase, AuthUseCase>();

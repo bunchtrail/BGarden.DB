@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using BGarden.Domain.Entities;
 using NetTopologySuite.Geometries;
-using BGarden.DB.Domain.Entities;
+
 
 namespace BGarden.Infrastructure.Data
 {
@@ -25,12 +25,6 @@ namespace BGarden.Infrastructure.Data
         // Новые сущности для улучшения безопасности
         public DbSet<AuthLog> AuthLogs { get; set; } = null!;
         public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
-        
-        // Сущности для модуля карты
-        public DbSet<MapMarker> MapMarkers { get; set; } = null!;
-        public DbSet<MapOptions> MapOptions { get; set; } = null!;
-        public DbSet<MapLayer> MapLayers { get; set; } = null!;
-        public DbSet<MapTileMetadata> MapTileMetadata { get; set; } = null!;
 
         // Переопределим OnModelCreating, чтобы применить конфигурации
         protected override void OnModelCreating(ModelBuilder modelBuilder)
