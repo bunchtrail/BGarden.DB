@@ -106,6 +106,15 @@ namespace BGarden.Application.Services
             }
 
             var map = mapDto.ToEntity();
+            
+            // Устанавливаем временные значения для обязательных полей
+            map.FilePath = "/maps/placeholder.png"; // Временный путь
+            map.ContentType = "image/png";
+            map.FileSize = 0;
+            map.UploadDate = DateTime.UtcNow;
+            map.LastUpdated = DateTime.UtcNow;
+            map.IsActive = true;
+            
             await _mapRepository.AddAsync(map);
             await _unitOfWork.SaveChangesAsync();
 
