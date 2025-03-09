@@ -6,6 +6,7 @@ using BGarden.Domain.Entities;
 using BGarden.Domain.Enums;
 using BGarden.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
+using NetTopologySuite.Geometries;
 
 namespace BGarden.Infrastructure.Repositories
 {
@@ -160,6 +161,14 @@ namespace BGarden.Infrastructure.Repositories
             return await _cacheService.GetOrCreateAsync(cacheKey, 
                 async () => await base.GetAllAsync(),
                 DefaultCacheTime);
+        }
+
+        public async Task<IEnumerable<Specimen>> GetSpecimensInBoundingBoxAsync(Envelope boundingBox)
+        {
+            // Для пространственных запросов кэширование менее эффективно, так как
+            // границы области могут быть разными в каждом запросе
+            // Поэтому просто делегируем вызов базовому репозиторию
+            return await _specimenRepository.GetSpecimensInBoundingBoxAsync(boundingBox);
         }
     }
 } 

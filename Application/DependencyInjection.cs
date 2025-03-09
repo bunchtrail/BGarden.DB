@@ -33,6 +33,7 @@ namespace BGarden.Application
             services.AddScoped<IPhenologyService, PhenologyService>();
             services.AddScoped<IBiometryService, BiometryService>();
             services.AddScoped<IRegionService, RegionService>();
+            services.AddScoped<IMapService, MapService>();
 
             // Регистрация вариантов использования
             services.AddScoped<IAuthUseCase, AuthUseCase>();

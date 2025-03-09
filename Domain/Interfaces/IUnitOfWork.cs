@@ -1,4 +1,3 @@
-
 using System;
 using System.Threading.Tasks;
 
@@ -17,6 +16,7 @@ namespace BGarden.Domain.Interfaces
         IPhenologyRepository Phenologies { get; }
         IRegionRepository Regions { get; }
         IUserRepository Users { get; }
+        IMapRepository Maps { get; }
 
         Task<int> SaveChangesAsync();
     }

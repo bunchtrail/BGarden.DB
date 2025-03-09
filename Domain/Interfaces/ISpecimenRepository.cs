@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using BGarden.Domain.Entities;
 using BGarden.Domain.Enums;
+using NetTopologySuite.Geometries;
 
 namespace BGarden.Domain.Interfaces
 {
@@ -32,5 +33,12 @@ namespace BGarden.Domain.Interfaces
         /// <param name="id">Идентификатор образца</param>
         /// <returns>Образец с загруженными связанными данными</returns>
         Task<Specimen?> GetByIdWithDetailsAsync(int id);
+        
+        /// <summary>
+        /// Получает все образцы в пределах указанной области карты.
+        /// </summary>
+        /// <param name="boundingBox">Геометрическая область (прямоугольник) для поиска растений</param>
+        /// <returns>Коллекция образцов, находящихся в указанной области</returns>
+        Task<IEnumerable<Specimen>> GetSpecimensInBoundingBoxAsync(Envelope boundingBox);
     }
 } 

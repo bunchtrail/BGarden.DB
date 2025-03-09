@@ -39,6 +39,7 @@ namespace BGarden.Infrastructure
             services.AddScoped<IPhenologyRepository, PhenologyRepository>();
             services.AddScoped<IRegionRepository, RegionRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IMapRepository, MapRepository>();
             
             // Регистрируем декораторы с кэшированием
             services.AddScoped<ISpecimenRepository>(provider => new CachedSpecimenRepository(

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using BGarden.Domain.Entities;
 using NetTopologySuite.Geometries;
+using Domain.Entities;
 
 
 namespace BGarden.Infrastructure.Data
@@ -25,6 +26,9 @@ namespace BGarden.Infrastructure.Data
         // Новые сущности для улучшения безопасности
         public DbSet<AuthLog> AuthLogs { get; set; } = null!;
         public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
+        
+        // Сущность для работы с картами
+        public DbSet<Map> Maps { get; set; } = null!;
 
         // Переопределим OnModelCreating, чтобы применить конфигурации
         protected override void OnModelCreating(ModelBuilder modelBuilder)

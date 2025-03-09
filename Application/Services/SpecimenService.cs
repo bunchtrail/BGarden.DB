@@ -4,6 +4,7 @@ using Application.Mappers;
 using BGarden.Domain.Entities;
 using BGarden.Domain.Interfaces;
 using BGarden.Domain.Enums;
+using NetTopologySuite.Geometries;
 
 namespace Application.Services
 {
@@ -79,6 +80,48 @@ namespace Application.Services
         {
             var specimens = await _unitOfWork.Specimens.GetSpecimensBySectorTypeAsync(sectorType);
             return specimens.Select(s => s.ToDto()).ToList();
+        }
+        
+        public async Task<IEnumerable<SpecimenDto>> GetSpecimensInBoundingBoxAsync(decimal minLat, decimal minLng, decimal maxLat, decimal maxLng)
+        {
+            // Создаем Envelope (прямоугольник) из координат
+            var boundingBox = new Envelope(
+                (double)minLng, 
+                (double)maxLng, 
+                (double)minLat, 
+                (double)maxLat
+            );
+            
+            var specimens = await _unitOfWork.Specimens.GetSpecimensInBoundingBoxAsync(boundingBox);
+            return specimens.Select(s => s.ToDto()).ToList();
+        }
+        
+        public async Task<SpecimenDto> AddSpecimenToMapAsync(SpecimenDto specimenDto)
+        {
+            // Проверяем, что координаты указаны
+            if (!specimenDto.Latitude.HasValue || !specimenDto.Longitude.HasValue)
+            {
+                throw new ArgumentException("Для добавления растения на карту необходимо указать координаты (широту и долготу)");
+            }
+            
+            // Используем существующий метод создания
+            return await CreateSpecimenAsync(specimenDto);
+        }
+        
+        public async Task<SpecimenDto?> UpdateSpecimenLocationAsync(int id, decimal latitude, decimal longitude)
+        {
+            var existing = await _unitOfWork.Specimens.GetByIdAsync(id);
+            if (existing == null) return null;
+            
+            // Обновляем только координаты
+            existing.Latitude = latitude;
+            existing.Longitude = longitude;
+            existing.Location = new Point((double)longitude, (double)latitude) { SRID = 4326 };
+            existing.LastUpdatedAt = DateTime.UtcNow;
+            
+            await _unitOfWork.SaveChangesAsync();
+            
+            return existing.ToDto();
         }
     }
 } 

@@ -39,5 +39,31 @@ namespace Application.Interfaces
         /// <param name="sectorType">Тип сектора (дендрология, флора, цветоводство)</param>
         /// <returns>Коллекция образцов, относящихся к указанному типу сектора</returns>
         Task<IEnumerable<SpecimenDto>> GetSpecimensBySectorTypeAsync(SectorType sectorType);
+        
+        /// <summary>
+        /// Получить все образцы в пределах указанной области карты.
+        /// </summary>
+        /// <param name="minLat">Минимальная широта</param>
+        /// <param name="minLng">Минимальная долгота</param>
+        /// <param name="maxLat">Максимальная широта</param>
+        /// <param name="maxLng">Максимальная долгота</param>
+        /// <returns>Коллекция образцов, находящихся в указанной области</returns>
+        Task<IEnumerable<SpecimenDto>> GetSpecimensInBoundingBoxAsync(decimal minLat, decimal minLng, decimal maxLat, decimal maxLng);
+        
+        /// <summary>
+        /// Добавить новое растение на карту с указанными координатами.
+        /// </summary>
+        /// <param name="specimenDto">Данные о растении</param>
+        /// <returns>Созданный экземпляр растения</returns>
+        Task<SpecimenDto> AddSpecimenToMapAsync(SpecimenDto specimenDto);
+        
+        /// <summary>
+        /// Обновить местоположение растения на карте.
+        /// </summary>
+        /// <param name="id">Идентификатор растения</param>
+        /// <param name="latitude">Новая широта</param>
+        /// <param name="longitude">Новая долгота</param>
+        /// <returns>Обновленный экземпляр растения</returns>
+        Task<SpecimenDto?> UpdateSpecimenLocationAsync(int id, decimal latitude, decimal longitude);
     }
 } 

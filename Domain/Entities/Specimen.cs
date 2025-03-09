@@ -1,3 +1,4 @@
+using Domain.Entities;
 using NetTopologySuite.Geometries;
 
 
@@ -189,6 +190,26 @@ namespace BGarden.Domain.Entities
         /// Дата последнего обновления записи
         /// </summary>
         public DateTime? LastUpdatedAt { get; set; }
+
+        /// <summary>
+        /// Идентификатор карты, на которой размещено растение
+        /// </summary>
+        public int? MapId { get; set; }
+        
+        /// <summary>
+        /// Карта, на которой размещено растение
+        /// </summary>
+        public Map? Map { get; set; }
+        
+        /// <summary>
+        /// Координата X на карте (в пикселях)
+        /// </summary>
+        public int? MapX { get; set; }
+        
+        /// <summary>
+        /// Координата Y на карте (в пикселях)
+        /// </summary>
+        public int? MapY { get; set; }
 
         // Навигационные свойства для связи «один ко многим» со сторонними таблицами:
         public ICollection<Phenology>? Phenologies { get; set; }

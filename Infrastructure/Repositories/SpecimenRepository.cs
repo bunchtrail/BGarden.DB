@@ -6,6 +6,7 @@ using BGarden.Domain.Entities;
 using BGarden.Domain.Interfaces;
 using BGarden.Infrastructure.Data;
 using BGarden.Domain.Enums;
+using NetTopologySuite.Geometries;
 
 namespace BGarden.Infrastructure.Repositories
 {
@@ -59,6 +60,25 @@ namespace BGarden.Infrastructure.Repositories
                 .Include(s => s.Biometries)
                 .Include(s => s.Phenologies)
                 .FirstOrDefaultAsync(s => s.Id == id);
+        }
+        
+        /// <inheritdoc/>
+        public async Task<IEnumerable<Specimen>> GetSpecimensInBoundingBoxAsync(Envelope boundingBox)
+        {
+            // Создаем полигон из границ области
+            var polygon = new Polygon(new LinearRing(new Coordinate[] {
+                new Coordinate(boundingBox.MinX, boundingBox.MinY),
+                new Coordinate(boundingBox.MaxX, boundingBox.MinY),
+                new Coordinate(boundingBox.MaxX, boundingBox.MaxY),
+                new Coordinate(boundingBox.MinX, boundingBox.MaxY),
+                new Coordinate(boundingBox.MinX, boundingBox.MinY)
+            })) { SRID = 4326 };
+
+            return await _dbSet
+                .Where(s => s.Location != null && s.Location.Within(polygon))
+                .Include(s => s.Family)
+                .Include(s => s.Exposition)
+                .ToListAsync();
         }
     }
 } 

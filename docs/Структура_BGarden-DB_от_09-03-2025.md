@@ -3,7 +3,7 @@
   - `add-specimens.cmd` (548.0 B)
   - `add-specimens.ps1` (847.0 B)
   - **Application**
-    - `Application.csproj` (596.0 B)
+    - `Application.csproj` (957.0 B)
     - **bin**
     - `DependencyInjection.cs` (1.8 KB)
     - **DTO**
@@ -12,6 +12,7 @@
       - `ExpositionDto.cs` (788.0 B)
       - `FamilyDto.cs` (792.0 B)
       - `LoginDto.cs` (1.3 KB)
+      - `MapDto.cs` (2.8 KB)
       - `PhenologyDto.cs` (1.4 KB)
       - `RefreshTokenDto.cs` (557.0 B)
       - `RegionDto.cs` (2.8 KB)
@@ -24,15 +25,17 @@
       - `IBiometryService.cs` (2.3 KB)
       - `IExpositionService.cs` (1.5 KB)
       - `IFamilyService.cs` (1.5 KB)
+      - `IMapService.cs` (1.7 KB)
       - `IPhenologyService.cs` (2.6 KB)
       - `IRegionService.cs` (2.3 KB)
-      - `ISpecimenService.cs` (1.8 KB)
+      - `ISpecimenService.cs` (3.5 KB)
       - `IUserService.cs` (2.0 KB)
     - **Mappers**
       - `AuthMapper.cs` (3.3 KB)
       - `BiometryMapper.cs` (1.9 KB)
       - `ExpositionMapper.cs` (1.5 KB)
       - `FamilyMapper.cs` (1.4 KB)
+      - `MapMapper.cs` (2.2 KB)
       - `PhenologyMapper.cs` (2.1 KB)
       - `RegionMapper.cs` (6.0 KB)
       - `SpecimenMapper.cs` (8.8 KB)
@@ -42,9 +45,10 @@
       - `BiometryService.cs` (3.0 KB)
       - `ExpositionService.cs` (2.4 KB)
       - `FamilyService.cs` (2.3 KB)
+      - `MapService.cs` (9.4 KB)
       - `PhenologyService.cs` (3.3 KB)
       - `RegionService.cs` (3.8 KB)
-      - `SpecimenService.cs` (3.1 KB)
+      - `SpecimenService.cs` (5.1 KB)
       - `UserService.cs` (6.4 KB)
     - **UseCases**
       - `AuthUseCase.cs` (20.3 KB)
@@ -53,9 +57,9 @@
         - `IAuthUseCase.cs` (4.4 KB)
   - **backup**
     - `IJwtService_backup.cs` (1.1 KB)
-  - `BGarden.DB.sln` (1.9 KB)
+  - `BGarden.DB.sln` (2.7 KB)
   - **docs**
-    - `Структура_BGarden-DB_от_09-03-2025.md` (4.7 KB)
+    - `Структура_BGarden-DB_от_09-03-2025.md` (5.2 KB)
   - **Domain**
     - **bin**
     - `Domain.csproj` (404.0 B)
@@ -64,10 +68,11 @@
       - `Biometry.cs` (1.4 KB)
       - `Exposition.cs` (936.0 B)
       - `Family.cs` (744.0 B)
+      - `Map.cs` (1.9 KB)
       - `Phenology.cs` (1.5 KB)
       - `RefreshToken.cs` (2.8 KB)
       - `Region.cs` (3.6 KB)
-      - `Specimen.cs` (7.1 KB)
+      - `Specimen.cs` (7.8 KB)
       - `User.cs` (3.5 KB)
     - **Enums**
       - `AuthEventType.cs` (2.0 KB)
@@ -80,11 +85,12 @@
       - `IExpositionRepository.cs` (517.0 B)
       - `IFamilyRepository.cs` (512.0 B)
       - `IJwtService.cs` (1.1 KB)
+      - `IMapRepository.cs` (1.1 KB)
       - `IPhenologyRepository.cs` (751.0 B)
       - `IRegionRepository.cs` (2.2 KB)
       - `IRepository.cs` (584.0 B)
-      - `ISpecimenRepository.cs` (2.0 KB)
-      - `IUnitOfWork.cs` (731.0 B)
+      - `ISpecimenRepository.cs` (2.6 KB)
+      - `IUnitOfWork.cs` (767.0 B)
       - `IUserRepository.cs` (1.2 KB)
     - **obj**
     - **Services**
@@ -94,12 +100,13 @@
     - **bin**
     - `ConsoleDbInitializer.cs` (3.3 KB)
     - **Data**
-      - `BotanicalContext.cs` (1.9 KB)
+      - `BotanicalContext.cs` (2.1 KB)
       - **Configurations**
         - `AuthLogConfiguration.cs` (2.1 KB)
         - `BiometryConfiguration.cs` (738.0 B)
         - `ExpositionConfiguration.cs` (872.0 B)
         - `FamilyConfiguration.cs` (868.0 B)
+        - `MapConfiguration.cs` (1.6 KB)
         - `PhenologyConfiguration.cs` (917.0 B)
         - `RefreshTokenConfiguration.cs` (1.7 KB)
         - `RegionConfiguration.cs` (3.1 KB)
@@ -117,26 +124,36 @@
     - **Migrations**
       - `20250309180328_init.cs` (21.6 KB)
       - `20250309180328_init.Designer.cs` (23.7 KB)
-      - `BotanicalContextModelSnapshot.cs` (23.6 KB)
+      - `20250309184843_addMap.cs` (3.8 KB)
+      - `20250309184843_addMap.Designer.cs` (26.3 KB)
+      - `BotanicalContextModelSnapshot.cs` (26.2 KB)
       - `README.md` (1.6 KB)
     - `Migrations.zip` (62.6 KB)
     - **obj**
     - `Program.cs` (2.9 KB)
     - **Repositories**
       - `BiometryRepository.cs` (1.6 KB)
-      - `CachedSpecimenRepository.cs` (7.8 KB)
+      - `CachedSpecimenRepository.cs` (8.4 KB)
       - `ExpositionRepository.cs` (876.0 B)
       - `FamilyRepository.cs` (852.0 B)
       - `LoggingRepositoryDecorator.cs` (5.5 KB)
+      - `MapRepository.cs` (1.9 KB)
       - `PhenologyRepository.cs` (1.9 KB)
       - `README.md` (2.9 KB)
       - `RegionRepository.cs` (11.0 KB)
       - `RepositoryBase.cs` (1.3 KB)
-      - `SpecimenRepository.cs` (2.3 KB)
-      - `UnitOfWork.cs` (2.6 KB)
+      - `SpecimenRepository.cs` (3.2 KB)
+      - `UnitOfWork.cs` (2.8 KB)
       - `UserRepository.cs` (1.9 KB)
     - **Services**
       - `AuthService.cs` (23.5 KB)
       - `CacheService.cs` (5.0 KB)
     - `SpecimenInitializer.cs` (3.1 KB)
   - `initialize-db.cmd` (450.0 B)
+  - **Tests**
+    - **BGarden.Tests**
+      - `BGarden.Tests.csproj` (941.0 B)
+      - **bin**
+      - **obj**
+      - `SpecimenServiceTests.cs` (7.3 KB)
+      - `UnitTest1.cs` (114.0 B)
