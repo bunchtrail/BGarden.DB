@@ -17,6 +17,15 @@ namespace Application.Interfaces
         /// Получить один Specimen по идентификатору.
         /// </summary>
         Task<SpecimenDto?> GetSpecimenByIdAsync(int id);
+        
+        /// <summary>
+        /// Получить отфильтрованные образцы по различным критериям
+        /// </summary>
+        /// <param name="name">Опциональный фильтр по имени</param>
+        /// <param name="familyId">Опциональный фильтр по ID семейства</param>
+        /// <param name="regionId">Опциональный фильтр по ID региона</param>
+        /// <returns>Отфильтрованная коллекция образцов</returns>
+        Task<IEnumerable<SpecimenDto>> GetFilteredSpecimensAsync(string? name = null, int? familyId = null, int? regionId = null);
 
         /// <summary>
         /// Создать новый Specimen (из DTO), вернёт созданный DTO (с Id).

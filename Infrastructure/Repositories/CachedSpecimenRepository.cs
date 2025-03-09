@@ -170,5 +170,15 @@ namespace BGarden.Infrastructure.Repositories
             // Поэтому просто делегируем вызов базовому репозиторию
             return await _specimenRepository.GetSpecimensInBoundingBoxAsync(boundingBox);
         }
+        
+        public async Task<IEnumerable<Specimen>> GetFilteredSpecimensAsync(string? name = null, int? familyId = null, int? regionId = null)
+        {
+            // Для запросов с фильтрацией создаём уникальный ключ кэша на основе параметров
+            string cacheKey = $"{CacheKeyPrefix}Filtered_Name_{name ?? "null"}_FamilyId_{familyId ?? 0}_RegionId_{regionId ?? 0}";
+            
+            return await _cacheService.GetOrCreateAsync(cacheKey, 
+                async () => await _specimenRepository.GetFilteredSpecimensAsync(name, familyId, regionId),
+                DefaultCacheTime);
+        }
     }
 } 

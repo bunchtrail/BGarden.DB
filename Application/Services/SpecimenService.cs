@@ -33,6 +33,13 @@ namespace Application.Services
             return specimen?.ToDto();
         }
 
+        public async Task<IEnumerable<SpecimenDto>> GetFilteredSpecimensAsync(string? name = null, int? familyId = null, int? regionId = null)
+        {
+            // Используем специализированный метод репозитория для получения отфильтрованных образцов
+            var specimens = await _unitOfWork.Specimens.GetFilteredSpecimensAsync(name, familyId, regionId);
+            return specimens.Select(s => s.ToDto()).ToList();
+        }
+
         public async Task<SpecimenDto> CreateSpecimenAsync(SpecimenDto specimenDto)
         {
             // Маппим DTO -> новая сущность

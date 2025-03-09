@@ -80,5 +80,38 @@ namespace BGarden.Infrastructure.Repositories
                 .Include(s => s.Exposition)
                 .ToListAsync();
         }
+        
+        /// <inheritdoc/>
+        public async Task<IEnumerable<Specimen>> GetFilteredSpecimensAsync(string? name = null, int? familyId = null, int? regionId = null)
+        {
+            // Начинаем с базового запроса
+            var query = _dbSet.AsQueryable();
+            
+            // Добавляем фильтры, если они указаны
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                query = query.Where(s => 
+
+                    (s.LatinName != null && s.LatinName.Contains(name)) ||
+                    (s.RussianName != null && s.RussianName.Contains(name)));
+            }
+            
+            if (familyId.HasValue)
+            {
+                query = query.Where(s => s.FamilyId == familyId.Value);
+            }
+            
+            if (regionId.HasValue)
+            {
+                query = query.Where(s => s.RegionId == regionId.Value);
+            }
+            
+            // Включаем связанные данные и выполняем запрос
+            return await query
+                .Include(s => s.Family)
+                .Include(s => s.Exposition)
+                .Include(s => s.Region)
+                .ToListAsync();
+        }
     }
 } 

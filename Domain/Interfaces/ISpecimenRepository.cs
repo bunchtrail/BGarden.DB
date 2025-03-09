@@ -40,5 +40,14 @@ namespace BGarden.Domain.Interfaces
         /// <param name="boundingBox">Геометрическая область (прямоугольник) для поиска растений</param>
         /// <returns>Коллекция образцов, находящихся в указанной области</returns>
         Task<IEnumerable<Specimen>> GetSpecimensInBoundingBoxAsync(Envelope boundingBox);
+        
+        /// <summary>
+        /// Получает отфильтрованные образцы по различным критериям
+        /// </summary>
+        /// <param name="name">Опциональный фильтр по имени</param>
+        /// <param name="familyId">Опциональный фильтр по ID семейства</param>
+        /// <param name="regionId">Опциональный фильтр по ID региона</param>
+        /// <returns>Отфильтрованная коллекция образцов</returns>
+        Task<IEnumerable<Specimen>> GetFilteredSpecimensAsync(string? name = null, int? familyId = null, int? regionId = null);
     }
 } 
