@@ -28,7 +28,7 @@
       - `IMapService.cs` (1.7 KB)
       - `IPhenologyService.cs` (2.6 KB)
       - `IRegionService.cs` (2.3 KB)
-      - `ISpecimenService.cs` (3.5 KB)
+      - `ISpecimenService.cs` (4.2 KB)
       - `IUserService.cs` (2.0 KB)
     - **Mappers**
       - `AuthMapper.cs` (3.3 KB)
@@ -45,10 +45,10 @@
       - `BiometryService.cs` (3.0 KB)
       - `ExpositionService.cs` (2.4 KB)
       - `FamilyService.cs` (2.3 KB)
-      - `MapService.cs` (9.4 KB)
+      - `MapService.cs` (9.8 KB)
       - `PhenologyService.cs` (3.3 KB)
       - `RegionService.cs` (3.8 KB)
-      - `SpecimenService.cs` (5.1 KB)
+      - `SpecimenService.cs` (5.6 KB)
       - `UserService.cs` (6.4 KB)
     - **UseCases**
       - `AuthUseCase.cs` (20.3 KB)
@@ -89,7 +89,7 @@
       - `IPhenologyRepository.cs` (751.0 B)
       - `IRegionRepository.cs` (2.2 KB)
       - `IRepository.cs` (584.0 B)
-      - `ISpecimenRepository.cs` (2.6 KB)
+      - `ISpecimenRepository.cs` (3.3 KB)
       - `IUnitOfWork.cs` (767.0 B)
       - `IUserRepository.cs` (1.2 KB)
     - **obj**
@@ -133,7 +133,7 @@
     - `Program.cs` (2.9 KB)
     - **Repositories**
       - `BiometryRepository.cs` (1.6 KB)
-      - `CachedSpecimenRepository.cs` (8.4 KB)
+      - `CachedSpecimenRepository.cs` (9.0 KB)
       - `ExpositionRepository.cs` (876.0 B)
       - `FamilyRepository.cs` (852.0 B)
       - `LoggingRepositoryDecorator.cs` (5.5 KB)
@@ -142,7 +142,7 @@
       - `README.md` (2.9 KB)
       - `RegionRepository.cs` (11.0 KB)
       - `RepositoryBase.cs` (1.3 KB)
-      - `SpecimenRepository.cs` (3.2 KB)
+      - `SpecimenRepository.cs` (4.5 KB)
       - `UnitOfWork.cs` (2.8 KB)
       - `UserRepository.cs` (1.9 KB)
     - **Services**

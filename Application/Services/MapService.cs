@@ -32,12 +32,39 @@ namespace BGarden.Application.Services
             _mapRepository = mapRepository;
             _unitOfWork = unitOfWork;
             _logger = logger;
-            _mapsFolder = mapsFolder ?? Path.Combine(AppContext.BaseDirectory, "wwwroot", "maps");
+            
+            // Определяем корневую папку приложения, исключая bin/Debug/net*
+            string appRootPath;
+            if (mapsFolder != null)
+            {
+                // Используем переданный путь, если он указан
+                _mapsFolder = mapsFolder;
+            }
+            else
+            {
+                // Получаем базовый путь исполнения и корректируем его
+                appRootPath = AppContext.BaseDirectory;
+                
+                // Если путь содержит bin/Debug или bin/Release, обрезаем его до корня приложения
+                if (appRootPath.Contains(Path.Combine("bin", "Debug")) || appRootPath.Contains(Path.Combine("bin", "Release")))
+                {
+                    // Возвращаемся на два уровня вверх, чтобы получить корень приложения
+                    var binIndex = appRootPath.IndexOf(Path.Combine("bin"));
+                    if (binIndex > 0)
+                    {
+                        appRootPath = appRootPath.Substring(0, binIndex);
+                    }
+                }
+                
+                _mapsFolder = Path.Combine(appRootPath, "wwwroot", "maps");
+                _logger.LogInformation("Maps folder path: {MapsFolder}", _mapsFolder);
+            }
             
             // Создаем директорию для хранения карт, если её нет
             if (!Directory.Exists(_mapsFolder))
             {
                 Directory.CreateDirectory(_mapsFolder);
+                _logger.LogInformation("Created maps directory: {MapsFolder}", _mapsFolder);
             }
         }
 
@@ -180,9 +207,17 @@ namespace BGarden.Application.Services
             }
 
             // Удаляем старый файл, если он существует
-            if (!string.IsNullOrEmpty(map.FilePath) && File.Exists(map.FilePath))
+            if (!string.IsNullOrEmpty(map.FilePath))
             {
-                File.Delete(map.FilePath);
+                // Получаем имя файла из относительного пути
+                var oldFileName = Path.GetFileName(map.FilePath);
+                var oldFilePath = Path.Combine(_mapsFolder, oldFileName);
+                
+                if (File.Exists(oldFilePath))
+                {
+                    File.Delete(oldFilePath);
+                    _logger.LogInformation("Удален старый файл карты: {OldFilePath}", oldFilePath);
+                }
             }
 
             // Формируем имя файла на основе ID карты и расширения
@@ -190,20 +225,42 @@ namespace BGarden.Application.Services
             var fileName = $"{map.Id:D5}_{DateTime.UtcNow:yyyyMMdd_HHmmss}{fileExtension}";
             var filePath = Path.Combine(_mapsFolder, fileName);
 
-            // Сохраняем файл
-            using (var stream = new FileStream(filePath, FileMode.Create))
+            _logger.LogInformation("Сохранение файла карты в: {FilePath}", filePath);
+
+            try
             {
-                await file.CopyToAsync(stream);
+                // Сохраняем файл
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+                
+                _logger.LogInformation("Файл успешно сохранен: {FileName}, размер: {FileSize} байт", fileName, file.Length);
+
+                // Обновляем информацию о карте
+                map.FilePath = $"/maps/{fileName}"; // Относительный путь для веб-приложения
+                map.ContentType = file.ContentType;
+                map.FileSize = file.Length;
+                map.LastUpdated = DateTime.UtcNow;
+
+                _mapRepository.Update(map);
+                await _unitOfWork.SaveChangesAsync();
+                
+                // Проверяем, существует ли файл после сохранения
+                if (File.Exists(filePath))
+                {
+                    _logger.LogInformation("Проверка файла: файл успешно создан по пути {FilePath}", filePath);
+                }
+                else
+                {
+                    _logger.LogWarning("Проверка файла: файл не найден по пути {FilePath} после сохранения!", filePath);
+                }
             }
-
-            // Обновляем информацию о карте
-            map.FilePath = $"/maps/{fileName}"; // Относительный путь для веб-приложения
-            map.ContentType = file.ContentType;
-            map.FileSize = file.Length;
-            map.LastUpdated = DateTime.UtcNow;
-
-            _mapRepository.Update(map);
-            await _unitOfWork.SaveChangesAsync();
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Ошибка при сохранении файла карты: {FilePath}", filePath);
+                throw new InvalidOperationException($"Ошибка при сохранении файла: {ex.Message}", ex);
+            }
 
             var specimensCount = await _mapRepository.GetSpecimensCountByMapIdAsync(id);
             _logger.LogInformation("Загружен файл карты для: {MapName} (ID: {MapId})", map.Name, map.Id);
