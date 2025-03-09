@@ -7,21 +7,33 @@ using BGarden.Infrastructure.Repositories;
 using BGarden.Infrastructure.Services;
 using BGarden.DB.Domain.Interfaces;
 using BGarden.DB.Infrastructure.Repositories;
+using Microsoft.Extensions.Logging;
 
 namespace BGarden.Infrastructure
 {
+    /// <summary>
+    /// Класс для настройки внедрения зависимостей в слое инфраструктуры
+    /// </summary>
     public static class DependencyInjection
     {
+        /// <summary>
+        /// Метод расширения для добавления служб инфраструктуры
+        /// </summary>
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
-            // Регистрируем DbContext
+            // Регистрируем контекст базы данных с повышенным уровнем логирования
             services.AddDbContext<BotanicalContext>(options =>
-                options.UseNpgsql(
-                    configuration.GetConnectionString("DefaultConnection"),
-                    b => b.MigrationsAssembly(typeof(BotanicalContext).Assembly.FullName)));
+                options.UseNpgsql(configuration.GetConnectionString("DefaultConnection") ?? ConnectionString.PostgreSQL,
+                    x => x.UseNetTopologySuite())
+                    .EnableSensitiveDataLogging()
+                    .EnableDetailedErrors());
 
-            // Регистрируем репозитории
-            services.AddScoped<ISpecimenRepository, SpecimenRepository>();
+            // Добавляем сервис кэширования
+            services.AddMemoryCache();
+            services.AddSingleton<ICacheService, CacheService>();
+
+            // Регистрируем базовые репозитории
+            services.AddScoped<SpecimenRepository>();
             services.AddScoped<IFamilyRepository, FamilyRepository>();
             services.AddScoped<IExpositionRepository, ExpositionRepository>();
             services.AddScoped<IBiometryRepository, BiometryRepository>();
@@ -29,20 +41,23 @@ namespace BGarden.Infrastructure
             services.AddScoped<IRegionRepository, RegionRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             
-            // Регистрируем репозитории для модуля карты
+            // Репозитории для модуля карты
             services.AddScoped<IMapMarkerRepository, MapMarkerRepository>();
             services.AddScoped<IMapOptionsRepository, MapOptionsRepository>();
+            services.AddScoped<IMapLayerRepository, MapLayerRepository>();
+            services.AddScoped<IMapTileMetadataRepository, MapTileMetadataRepository>();
+
+            // Регистрируем декораторы с кэшированием
+            services.AddScoped<ISpecimenRepository>(provider => new CachedSpecimenRepository(
+                provider.GetRequiredService<SpecimenRepository>(),
+                provider.GetRequiredService<ICacheService>(),
+                provider.GetRequiredService<ILogger<CachedSpecimenRepository>>()));
 
             // Регистрируем UnitOfWork
             services.AddScoped<IUnitOfWork, UnitOfWork>();
-            
+
             // Регистрируем сервисы
-            services.AddScoped<IAuthService>(provider => 
-                new AuthService(
-                    provider.GetRequiredService<BotanicalContext>(),
-                    configuration
-                )
-            );
+            services.AddScoped<IAuthService, AuthService>();
 
             return services;
         }

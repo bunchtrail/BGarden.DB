@@ -22,6 +22,12 @@ namespace Application.DTO
         public decimal? Longitude { get; set; }
 
         /// <summary>
+        /// Географическая точка в формате WKT (Well-Known Text)
+        /// Например: "POINT(30.123 59.876)"
+        /// </summary>
+        public string? LocationWkt { get; set; }
+
+        /// <summary>
         /// Идентификатор области (региона), в которой находится растение
         /// </summary>
         public int? RegionId { get; set; }

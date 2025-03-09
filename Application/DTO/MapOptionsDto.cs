@@ -66,6 +66,16 @@ namespace BGarden.DB.Application.DTO
         /// Указывает, является ли эта конфигурация активной по умолчанию
         /// </summary>
         public bool IsDefault { get; set; }
+        
+        /// <summary>
+        /// Дата создания настроек
+        /// </summary>
+        public DateTime CreatedAt { get; set; }
+        
+        /// <summary>
+        /// Дата последнего обновления настроек
+        /// </summary>
+        public DateTime UpdatedAt { get; set; }
     }
 
     /// <summary>

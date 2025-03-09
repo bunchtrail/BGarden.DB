@@ -45,6 +45,27 @@ namespace Application.DTO
         public string? BoundaryWkt { get; set; }
 
         /// <summary>
+        /// Список координат для построения полигона в формате GeoJSON
+        /// Пример: [[lon1,lat1],[lon2,lat2],[lon3,lat3],[lon1,lat1]]
+        /// </summary>
+        public string? PolygonCoordinates { get; set; }
+
+        /// <summary>
+        /// Цвет границы области в формате HEX или RGBA
+        /// </summary>
+        public string? StrokeColor { get; set; }
+
+        /// <summary>
+        /// Цвет заливки области в формате HEX или RGBA
+        /// </summary>
+        public string? FillColor { get; set; }
+
+        /// <summary>
+        /// Прозрачность заливки (от 0 до 1)
+        /// </summary>
+        public decimal? FillOpacity { get; set; }
+
+        /// <summary>
         /// Тип сектора, к которому относится область
         /// </summary>
         public SectorType SectorType { get; set; }

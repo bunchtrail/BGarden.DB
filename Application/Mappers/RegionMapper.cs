@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Collections.Generic;
 using Application.DTO;
 using BGarden.Domain.Entities;
 using NetTopologySuite.Geometries;
@@ -11,6 +12,9 @@ namespace Application.Mappers
     /// </summary>
     public static class RegionMapper
     {
+        private static readonly WKTReader _wktReader = new WKTReader();
+        private static readonly WKTWriter _wktWriter = new WKTWriter();
+
         /// <summary>
         /// Преобразует сущность Region в DTO.
         /// </summary>
@@ -19,7 +23,7 @@ namespace Application.Mappers
             if (region == null)
                 return null!;
 
-            return new RegionDto
+            var dto = new RegionDto
             {
                 Id = region.Id,
                 Name = region.Name,
@@ -28,8 +32,23 @@ namespace Application.Mappers
                 Longitude = region.Longitude,
                 Radius = region.Radius,
                 BoundaryWkt = region.BoundaryWkt,
-                SectorType = region.SectorType
+                SectorType = region.SectorType,
+                PolygonCoordinates = region.PolygonCoordinates,
+                StrokeColor = region.StrokeColor,
+                FillColor = region.FillColor,
+                FillOpacity = region.FillOpacity
             };
+
+            // Если у нас есть пространственные данные, преобразуем их в WKT
+            if (region.Boundary != null)
+            {
+                dto.BoundaryWkt = _wktWriter.Write(region.Boundary);
+            }
+
+            // Подсчет количества образцов
+            dto.SpecimensCount = region.Specimens?.Count ?? 0;
+
+            return dto;
         }
 
         /// <summary>
@@ -58,6 +77,32 @@ namespace Application.Mappers
             region.Radius = dto.Radius;
             region.BoundaryWkt = dto.BoundaryWkt;
             region.SectorType = dto.SectorType;
+            region.PolygonCoordinates = dto.PolygonCoordinates;
+            region.StrokeColor = dto.StrokeColor;
+            region.FillColor = dto.FillColor;
+            region.FillOpacity = dto.FillOpacity;
+
+            // Создаем геометрическую точку для центра региона
+            region.Location = new Point(((double)dto.Longitude), ((double)dto.Latitude)) { SRID = 4326 };
+
+            // Если у нас есть WKT границы, преобразуем его в полигон
+            if (!string.IsNullOrEmpty(dto.BoundaryWkt))
+            {
+                try
+                {
+                    var geometry = _wktReader.Read(dto.BoundaryWkt);
+                    if (geometry is Polygon polygon)
+                    {
+                        polygon.SRID = 4326; // WGS 84
+                        region.Boundary = polygon;
+                    }
+                }
+                catch
+                {
+                    // В случае ошибки при чтении WKT, оставляем Boundary как null
+                    region.Boundary = null;
+                }
+            }
         }
 
         /// <summary>
@@ -68,7 +113,7 @@ namespace Application.Mappers
             if (dto == null)
                 return null!;
 
-            return new Region
+            var region = new Region
             {
                 // Id не устанавливаем, его присвоит БД
                 Name = dto.Name,
@@ -77,8 +122,38 @@ namespace Application.Mappers
                 Longitude = dto.Longitude,
                 Radius = dto.Radius,
                 BoundaryWkt = dto.BoundaryWkt,
-                SectorType = dto.SectorType
+                SectorType = dto.SectorType,
+                PolygonCoordinates = dto.PolygonCoordinates,
+                StrokeColor = dto.StrokeColor,
+                FillColor = dto.FillColor,
+                FillOpacity = dto.FillOpacity,
+                CreatedAt = System.DateTime.UtcNow,
+                UpdatedAt = System.DateTime.UtcNow
             };
+
+            // Создаем геометрическую точку для центра региона
+            region.Location = new Point(((double)dto.Longitude), ((double)dto.Latitude)) { SRID = 4326 };
+
+            // Если у нас есть WKT границы, преобразуем его в полигон
+            if (!string.IsNullOrEmpty(dto.BoundaryWkt))
+            {
+                try
+                {
+                    var geometry = _wktReader.Read(dto.BoundaryWkt);
+                    if (geometry is Polygon polygon)
+                    {
+                        polygon.SRID = 4326; // WGS 84
+                        region.Boundary = polygon;
+                    }
+                }
+                catch
+                {
+                    // В случае ошибки при чтении WKT, оставляем Boundary как null
+                    region.Boundary = null;
+                }
+            }
+
+            return region;
         }
     }
 } 

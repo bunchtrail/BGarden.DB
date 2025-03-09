@@ -25,7 +25,8 @@ namespace BGarden.Infrastructure.Repositories
         public async Task<IEnumerable<Specimen>> FindBySpeciesNameAsync(string speciesName)
         {
             return await _dbSet
-                .Where(x => x.LatinName.Contains(speciesName) || x.RussianName.Contains(speciesName))
+                .Where(x => (x.LatinName != null && x.LatinName.Contains(speciesName)) || 
+                           (x.RussianName != null && x.RussianName.Contains(speciesName)))
                 .ToListAsync();
         }
 

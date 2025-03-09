@@ -4,6 +4,7 @@ using BGarden.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using NetTopologySuite.Geometries;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
@@ -20,7 +21,85 @@ namespace Infrastructure.Migrations
                 .HasAnnotation("ProductVersion", "9.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
+            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "postgis");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("BGarden.DB.Domain.Entities.MapLayer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("BaseDirectory")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<double?>("MaxX")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("MaxY")
+                        .HasColumnType("double precision");
+
+                    b.Property<int>("MaxZoom")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(18);
+
+                    b.Property<double?>("MinX")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("MinY")
+                        .HasColumnType("double precision");
+
+                    b.Property<int>("MinZoom")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("TileFormat")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasDefaultValue("png");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("MapLayers", (string)null);
+                });
 
             modelBuilder.Entity("BGarden.DB.Domain.Entities.MapMarker", b =>
                 {
@@ -40,8 +119,14 @@ namespace Infrastructure.Migrations
                     b.Property<double>("Latitude")
                         .HasColumnType("double precision");
 
+                    b.Property<Point>("Location")
+                        .HasColumnType("geometry(Point,4326)");
+
                     b.Property<double>("Longitude")
                         .HasColumnType("double precision");
+
+                    b.Property<string>("PopupContent")
+                        .HasColumnType("text");
 
                     b.Property<int?>("RegionId")
                         .HasColumnType("integer");
@@ -64,6 +149,9 @@ namespace Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Location")
+                        .HasDatabaseName("IX_MapMarker_Location_Spatial");
 
                     b.HasIndex("RegionId");
 
@@ -95,6 +183,9 @@ namespace Infrastructure.Migrations
                     b.Property<int>("DefaultZoom")
                         .HasColumnType("integer");
 
+                    b.Property<double?>("EastBound")
+                        .HasColumnType("double precision");
+
                     b.Property<bool>("IsDefault")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
@@ -116,8 +207,20 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<double?>("NorthBound")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("SouthBound")
+                        .HasColumnType("double precision");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<double?>("WestBound")
+                        .HasColumnType("double precision");
+
+                    b.Property<int>("Zoom")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -126,6 +229,56 @@ namespace Infrastructure.Migrations
                         .HasFilter("\"IsDefault\" = TRUE");
 
                     b.ToTable("MapOptions");
+                });
+
+            modelBuilder.Entity("BGarden.DB.Domain.Entities.MapTileMetadata", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Checksum")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<int>("FileSize")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("MapLayerId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("RelativePath")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<int>("TileColumn")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TileRow")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<int>("ZoomLevel")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MapLayerId", "ZoomLevel", "TileColumn", "TileRow")
+                        .IsUnique();
+
+                    b.ToTable("MapTileMetadata", (string)null);
                 });
 
             modelBuilder.Entity("BGarden.Domain.Entities.AuthLog", b =>
@@ -351,6 +504,9 @@ namespace Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<Polygon>("Boundary")
+                        .HasColumnType("geometry(Polygon,4326)");
+
                     b.Property<string>("BoundaryWkt")
                         .HasColumnType("text");
 
@@ -370,6 +526,9 @@ namespace Infrastructure.Migrations
 
                     b.Property<decimal>("Latitude")
                         .HasColumnType("decimal(9,6)");
+
+                    b.Property<Point>("Location")
+                        .HasColumnType("geometry(Point,4326)");
 
                     b.Property<decimal>("Longitude")
                         .HasColumnType("decimal(9,6)");
@@ -484,6 +643,9 @@ namespace Infrastructure.Migrations
                     b.Property<decimal?>("Latitude")
                         .HasColumnType("decimal(9,6)");
 
+                    b.Property<Point>("Location")
+                        .HasColumnType("geometry(Point,4326)");
+
                     b.Property<decimal?>("Longitude")
                         .HasColumnType("decimal(9,6)");
 
@@ -536,6 +698,9 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("InventoryNumber")
                         .IsUnique();
+
+                    b.HasIndex("Location")
+                        .HasDatabaseName("IX_Specimen_Location_Spatial");
 
                     b.HasIndex("RegionId");
 
@@ -647,6 +812,17 @@ namespace Infrastructure.Migrations
                     b.Navigation("Specimen");
                 });
 
+            modelBuilder.Entity("BGarden.DB.Domain.Entities.MapTileMetadata", b =>
+                {
+                    b.HasOne("BGarden.DB.Domain.Entities.MapLayer", "MapLayer")
+                        .WithMany("TileMetadata")
+                        .HasForeignKey("MapLayerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MapLayer");
+                });
+
             modelBuilder.Entity("BGarden.Domain.Entities.AuthLog", b =>
                 {
                     b.HasOne("BGarden.Domain.Entities.User", "User")
@@ -720,6 +896,11 @@ namespace Infrastructure.Migrations
                     b.Navigation("Family");
 
                     b.Navigation("Region");
+                });
+
+            modelBuilder.Entity("BGarden.DB.Domain.Entities.MapLayer", b =>
+                {
+                    b.Navigation("TileMetadata");
                 });
 
             modelBuilder.Entity("BGarden.Domain.Entities.Exposition", b =>

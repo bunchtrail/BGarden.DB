@@ -10,6 +10,7 @@ using BGarden.DB.Infrastructure.Data;
 using BGarden.Infrastructure.Repositories;
 using BGarden.Infrastructure.Data;
 using BGarden.Domain.Entities;
+using NetTopologySuite.Geometries;
 
 namespace BGarden.DB.Infrastructure.Repositories
 {
@@ -75,6 +76,33 @@ namespace BGarden.DB.Infrastructure.Repositories
             await _context.SaveChangesAsync();
             
             return marker;
+        }
+
+        /// <inheritdoc/>
+        public async Task<IEnumerable<MapMarker>> FindNearbyAsync(Point point, double radiusInMeters)
+        {
+            // Временное решение: вместо пространственного поиска используем простой поиск по координатам
+            // Приблизительное расстояние 1 градуса широты в метрах (на экваторе)
+            const double metersPerDegreeLat = 111111;
+            
+            // Приблизительное расстояние 1 градуса долготы на заданной широте в метрах
+            // (зависит от широты, уменьшается от экватора к полюсам)
+            double latitude = point.Y;
+            double longitude = point.X;
+            double metersPerDegreeLon = metersPerDegreeLat * Math.Cos(latitude * Math.PI / 180);
+            
+            // Преобразуем радиус из метров в градусы для широты и долготы
+            double latDelta = radiusInMeters / metersPerDegreeLat;
+            double lonDelta = radiusInMeters / metersPerDegreeLon;
+            
+            // Ищем области, центр которых находится в пределах указанного прямоугольника
+            return await _dbSet
+                .Where(m => 
+                    m.Latitude >= latitude - latDelta &&
+                    m.Latitude <= latitude + latDelta &&
+                    m.Longitude >= longitude - lonDelta &&
+                    m.Longitude <= longitude + lonDelta)
+                .ToListAsync();
         }
     }
 } 

@@ -39,8 +39,9 @@ namespace BGarden.Infrastructure.Data.Configurations
                    .HasColumnType("decimal(9,6)")
                    .IsRequired();
 
-            // Игнорируем пространственное поле Location в базе данных
-            builder.Ignore(r => r.Location);
+            // Используем пространственное поле Location в базе данных
+            builder.Property(r => r.Location)
+                   .HasColumnType("geometry(Point,4326)");
 
             // Добавляем поле для координат полигона
             builder.Property(r => r.PolygonCoordinates)
@@ -60,8 +61,9 @@ namespace BGarden.Infrastructure.Data.Configurations
             builder.HasIndex(r => new { r.Latitude, r.Longitude })
                    .HasDatabaseName("IX_Region_Coordinates");
 
-            // Игнорируем поле Boundary в базе данных
-            builder.Ignore(r => r.Boundary);
+            // Настраиваем использование пространственного типа для Boundary
+            builder.Property(r => r.Boundary)
+                   .HasColumnType("geometry(Polygon,4326)");
 
             // Даты создания и обновления
             builder.Property(r => r.CreatedAt)

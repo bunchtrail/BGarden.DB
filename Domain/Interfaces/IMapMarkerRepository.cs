@@ -5,6 +5,7 @@ using BGarden.DB.Domain.Entities;
 using BGarden.DB.Domain.Enums;
 using BGarden.Domain.Interfaces;
 using BGarden.Domain.Entities;
+using NetTopologySuite.Geometries;
 
 namespace BGarden.DB.Domain.Interfaces
 {
@@ -14,18 +15,48 @@ namespace BGarden.DB.Domain.Interfaces
     public interface IMapMarkerRepository : IRepository<MapMarker>
     {
         /// <summary>
+        /// Получить все маркеры
+        /// </summary>
+        Task<IEnumerable<MapMarker>> GetAllAsync();
+        
+        /// <summary>
+        /// Получить маркер по идентификатору
+        /// </summary>
+        Task<MapMarker> GetByIdAsync(int id);
+        
+        /// <summary>
         /// Получить маркеры по типу
         /// </summary>
         /// <param name="type">Тип маркера</param>
         /// <returns>Список маркеров указанного типа</returns>
         Task<IEnumerable<MapMarker>> GetByTypeAsync(MarkerType type);
-
+        
         /// <summary>
-        /// Получить маркер, связанный с указанным экземпляром растения
+        /// Получить маркеры для конкретного экземпляра
         /// </summary>
         /// <param name="specimenId">Идентификатор экземпляра растения</param>
         /// <returns>Маркер, связанный с указанным экземпляром</returns>
         Task<MapMarker?> GetBySpecimenIdAsync(int specimenId);
+        
+        /// <summary>
+        /// Добавить новый маркер
+        /// </summary>
+        Task AddAsync(MapMarker marker);
+        
+        /// <summary>
+        /// Обновить существующий маркер
+        /// </summary>
+        void Update(MapMarker marker);
+        
+        /// <summary>
+        /// Удалить маркер
+        /// </summary>
+        void Remove(MapMarker marker);
+        
+        /// <summary>
+        /// Найти ближайшие маркеры к указанной точке в пределах радиуса (в метрах)
+        /// </summary>
+        Task<IEnumerable<MapMarker>> FindNearbyAsync(Point point, double radiusInMeters);
 
         /// <summary>
         /// Получить маркеры в указанном географическом прямоугольнике

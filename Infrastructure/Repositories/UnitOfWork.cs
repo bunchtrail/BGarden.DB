@@ -18,6 +18,8 @@ namespace BGarden.Infrastructure.Repositories
         private readonly IUserRepository _userRepository;
         private readonly IMapMarkerRepository _mapMarkerRepository;
         private readonly IMapOptionsRepository _mapOptionsRepository;
+        private readonly IMapLayerRepository _mapLayerRepository;
+        private readonly IMapTileMetadataRepository _mapTileMetadataRepository;
         private bool _disposed = false;
 
         public UnitOfWork(
@@ -30,7 +32,9 @@ namespace BGarden.Infrastructure.Repositories
             IRegionRepository regionRepository,
             IUserRepository userRepository,
             IMapMarkerRepository mapMarkerRepository,
-            IMapOptionsRepository mapOptionsRepository)
+            IMapOptionsRepository mapOptionsRepository,
+            IMapLayerRepository mapLayerRepository,
+            IMapTileMetadataRepository mapTileMetadataRepository)
         {
             _context = context;
             _specimenRepository = specimenRepository;
@@ -42,6 +46,8 @@ namespace BGarden.Infrastructure.Repositories
             _userRepository = userRepository;
             _mapMarkerRepository = mapMarkerRepository;
             _mapOptionsRepository = mapOptionsRepository;
+            _mapLayerRepository = mapLayerRepository;
+            _mapTileMetadataRepository = mapTileMetadataRepository;
         }
 
         public ISpecimenRepository Specimens => _specimenRepository;
@@ -53,6 +59,8 @@ namespace BGarden.Infrastructure.Repositories
         public IUserRepository Users => _userRepository;
         public IMapMarkerRepository MapMarkers => _mapMarkerRepository;
         public IMapOptionsRepository MapOptions => _mapOptionsRepository;
+        public IMapLayerRepository MapLayers => _mapLayerRepository;
+        public IMapTileMetadataRepository MapTileMetadata => _mapTileMetadataRepository;
 
         public async Task<int> SaveChangesAsync()
         {

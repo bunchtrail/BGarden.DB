@@ -1,6 +1,7 @@
 using System;
 using BGarden.DB.Domain.Enums;
 using BGarden.Domain.Entities;
+using NetTopologySuite.Geometries;
 
 namespace BGarden.DB.Domain.Entities
 {
@@ -23,6 +24,11 @@ namespace BGarden.DB.Domain.Entities
         /// Долгота (координата)
         /// </summary>
         public double Longitude { get; set; }
+        
+        /// <summary>
+        /// Геометрическая точка местоположения маркера
+        /// </summary>
+        public Point? Location { get; set; }
 
         /// <summary>
         /// Заголовок маркера
@@ -38,6 +44,11 @@ namespace BGarden.DB.Domain.Entities
         /// Описание маркера (опциональное)
         /// </summary>
         public string? Description { get; set; }
+
+        /// <summary>
+        /// HTML-контент для всплывающего окна маркера (опциональный)
+        /// </summary>
+        public string? PopupContent { get; set; }
 
         /// <summary>
         /// Идентификатор экземпляра растения

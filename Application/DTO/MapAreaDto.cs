@@ -5,121 +5,160 @@ using BGarden.DB.Domain.Enums;
 namespace BGarden.DB.Application.DTO
 {
     /// <summary>
-    /// DTO для координаты области на карте
-    /// </summary>
-    public class MapAreaCoordinateDto
-    {
-        /// <summary>
-        /// Широта (координата)
-        /// </summary>
-        public double Latitude { get; set; }
-
-        /// <summary>
-        /// Долгота (координата)
-        /// </summary>
-        public double Longitude { get; set; }
-
-        /// <summary>
-        /// Порядок координаты в полигоне
-        /// </summary>
-        public int Order { get; set; }
-    }
-
-    /// <summary>
-    /// DTO для области на карте
+    /// DTO для зоны карты
     /// </summary>
     public class MapAreaDto
     {
         /// <summary>
-        /// Идентификатор области
+        /// Идентификатор зоны
         /// </summary>
         public int Id { get; set; }
 
         /// <summary>
-        /// Название области
+        /// Название зоны
         /// </summary>
         public string Name { get; set; }
 
         /// <summary>
-        /// Описание области (опциональное)
+        /// Описание зоны
         /// </summary>
         public string Description { get; set; }
 
         /// <summary>
-        /// Тип области
+        /// Тип зоны
         /// </summary>
         public AreaType Type { get; set; }
 
         /// <summary>
-        /// Цвет границы области в формате HEX или RGBA (опциональный)
+        /// GeoJSON полигона зоны
         /// </summary>
-        public string Color { get; set; }
+        public string GeoJson { get; set; }
 
         /// <summary>
-        /// Цвет заливки области в формате HEX или RGBA (опциональный)
+        /// Цвет заливки (HEX формат)
         /// </summary>
         public string FillColor { get; set; }
 
         /// <summary>
-        /// Координаты для построения полигона области
+        /// Цвет границы (HEX формат)
         /// </summary>
-        public IEnumerable<MapAreaCoordinateDto> Coordinates { get; set; }
+        public string StrokeColor { get; set; }
 
         /// <summary>
-        /// Ссылка на экспозицию (если применимо)
+        /// Прозрачность заливки (0-1)
         /// </summary>
-        public int? ExpositionId { get; set; }
+        public float FillOpacity { get; set; }
+
+        /// <summary>
+        /// Толщина границы
+        /// </summary>
+        public float StrokeWeight { get; set; }
+
+        /// <summary>
+        /// Дата создания
+        /// </summary>
+        public DateTime CreatedAt { get; set; }
+
+        /// <summary>
+        /// Дата обновления
+        /// </summary>
+        public DateTime UpdatedAt { get; set; }
     }
 
     /// <summary>
-    /// DTO для создания области на карте
+    /// DTO для создания зоны карты
     /// </summary>
     public class CreateMapAreaDto
     {
         /// <summary>
-        /// Название области
+        /// Название зоны
         /// </summary>
         public string Name { get; set; }
 
         /// <summary>
-        /// Описание области (опциональное)
+        /// Описание зоны
         /// </summary>
         public string Description { get; set; }
 
         /// <summary>
-        /// Тип области
+        /// Тип зоны
         /// </summary>
         public AreaType Type { get; set; }
 
         /// <summary>
-        /// Цвет границы области в формате HEX или RGBA (опциональный)
+        /// GeoJSON полигона зоны
         /// </summary>
-        public string Color { get; set; }
+        public string GeoJson { get; set; }
 
         /// <summary>
-        /// Цвет заливки области в формате HEX или RGBA (опциональный)
+        /// Цвет заливки (HEX формат)
+        /// </summary>
+        public string FillColor { get; set; } = "#3388ff";
+
+        /// <summary>
+        /// Цвет границы (HEX формат)
+        /// </summary>
+        public string StrokeColor { get; set; } = "#3388ff";
+
+        /// <summary>
+        /// Прозрачность заливки (0-1)
+        /// </summary>
+        public float FillOpacity { get; set; } = 0.2f;
+
+        /// <summary>
+        /// Толщина границы
+        /// </summary>
+        public float StrokeWeight { get; set; } = 3.0f;
+    }
+
+    /// <summary>
+    /// DTO для обновления зоны карты
+    /// </summary>
+    public class UpdateMapAreaDto
+    {
+        /// <summary>
+        /// Идентификатор зоны
+        /// </summary>
+        public int Id { get; set; }
+
+        /// <summary>
+        /// Название зоны
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// Описание зоны
+        /// </summary>
+        public string Description { get; set; }
+
+        /// <summary>
+        /// Тип зоны
+        /// </summary>
+        public AreaType Type { get; set; }
+
+        /// <summary>
+        /// GeoJSON полигона зоны
+        /// </summary>
+        public string GeoJson { get; set; }
+
+        /// <summary>
+        /// Цвет заливки (HEX формат)
         /// </summary>
         public string FillColor { get; set; }
 
         /// <summary>
-        /// Координаты для построения полигона области
+        /// Цвет границы (HEX формат)
         /// </summary>
-        public IEnumerable<MapAreaCoordinateDto> Coordinates { get; set; }
+        public string StrokeColor { get; set; }
 
         /// <summary>
-        /// Ссылка на экспозицию (если применимо)
+        /// Прозрачность заливки (0-1)
         /// </summary>
-        public int? ExpositionId { get; set; }
-    }
+        public float FillOpacity { get; set; }
 
-    /// <summary>
-    /// DTO для обновления области на карте
-    /// </summary>
-    public class UpdateMapAreaDto : CreateMapAreaDto
-    {
         /// <summary>
-        /// Идентификатор области для обновления
+        /// Толщина границы
         /// </summary>
-        public int Id { get; set; }
+        public float StrokeWeight { get; set; }
     }
 } 

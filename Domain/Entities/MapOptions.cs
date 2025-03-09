@@ -33,6 +33,11 @@ namespace BGarden.DB.Domain.Entities
         public int DefaultZoom { get; set; }
 
         /// <summary>
+        /// Уровень масштабирования
+        /// </summary>
+        public int Zoom { get; set; }
+
+        /// <summary>
         /// Минимальный уровень масштабирования
         /// </summary>
         public int MinZoom { get; set; } = 1;
@@ -46,6 +51,26 @@ namespace BGarden.DB.Domain.Entities
         /// Путь к файлу схемы карты
         /// </summary>
         public string MapSchemaUrl { get; set; }
+
+        /// <summary>
+        /// Южная граница (опционально)
+        /// </summary>
+        public double? SouthBound { get; set; }
+
+        /// <summary>
+        /// Западная граница (опционально)
+        /// </summary>
+        public double? WestBound { get; set; }
+
+        /// <summary>
+        /// Северная граница (опционально)
+        /// </summary>
+        public double? NorthBound { get; set; }
+
+        /// <summary>
+        /// Восточная граница (опционально)
+        /// </summary>
+        public double? EastBound { get; set; }
 
         /// <summary>
         /// Указывает, является ли эта конфигурация активной по умолчанию

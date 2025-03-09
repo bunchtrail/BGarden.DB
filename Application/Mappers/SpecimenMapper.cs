@@ -1,17 +1,24 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Application.DTO;
 using BGarden.Domain.Entities;
 using NetTopologySuite.Geometries;
+using NetTopologySuite.IO;
 
 namespace Application.Mappers
 {
     public static class SpecimenMapper
     {
+        private static readonly WKTReader _wktReader = new WKTReader();
+        private static readonly WKTWriter _wktWriter = new WKTWriter();
+
         /// <summary>
         /// Преобразовать доменную сущность в DTO.
         /// </summary>
         public static SpecimenDto ToDto(this Specimen entity)
         {
-            return new SpecimenDto
+            var dto = new SpecimenDto
             {
                 Id = entity.Id,
                 InventoryNumber = entity.InventoryNumber,
@@ -47,6 +54,14 @@ namespace Application.Mappers
                 Notes = entity.Notes,
                 FilledBy = entity.FilledBy
             };
+
+            // Если у нас есть пространственные данные, преобразуем их в WKT
+            if (entity.Location != null)
+            {
+                dto.LocationWkt = _wktWriter.Write(entity.Location);
+            }
+            
+            return dto;
         }
 
         /// <summary>
@@ -54,9 +69,8 @@ namespace Application.Mappers
         /// </summary>
         public static Specimen ToEntity(this SpecimenDto dto)
         {
-            var specimen = new Specimen
+            var entity = new Specimen
             {
-                // Id = не задаём вручную, обычно автогенерируется
                 InventoryNumber = dto.InventoryNumber,
                 SectorType = dto.SectorType,
                 Latitude = dto.Latitude,
@@ -85,19 +99,38 @@ namespace Application.Mappers
                 Country = dto.Country,
                 Illustration = dto.Illustration,
                 Notes = dto.Notes,
-                FilledBy = dto.FilledBy
+                FilledBy = dto.FilledBy,
+                CreatedAt = DateTime.UtcNow
             };
 
-            // Создаем геометрическую точку, если заданы координаты
+            // Создаем геометрическую точку для местоположения образца, если известны координаты
             if (dto.Latitude.HasValue && dto.Longitude.HasValue)
             {
-                specimen.Location = new Point((double)dto.Longitude.Value, (double)dto.Latitude.Value) 
-                { 
-                    SRID = 4326 // WGS84 - стандартная система координат для GPS
-                };
+                entity.Location = new Point(((double)dto.Longitude.Value), ((double)dto.Latitude.Value)) { SRID = 4326 };
+            }
+            // Если есть WKT-представление, попробуем создать точку из него
+            else if (!string.IsNullOrEmpty(dto.LocationWkt))
+            {
+                try
+                {
+                    var geometry = _wktReader.Read(dto.LocationWkt);
+                    if (geometry is Point point)
+                    {
+                        point.SRID = 4326; // WGS 84
+                        entity.Location = point;
+                        // Обновляем также Latitude и Longitude
+                        entity.Latitude = (decimal)point.Y;
+                        entity.Longitude = (decimal)point.X;
+                    }
+                }
+                catch
+                {
+                    // В случае ошибки при чтении WKT, оставляем Location как null
+                    entity.Location = null;
+                }
             }
 
-            return specimen;
+            return entity;
         }
 
         /// <summary>
@@ -134,14 +167,33 @@ namespace Application.Mappers
             entity.Illustration = dto.Illustration;
             entity.Notes = dto.Notes;
             entity.FilledBy = dto.FilledBy;
+            entity.LastUpdatedAt = DateTime.UtcNow;
 
-            // Обновляем геометрическую точку
+            // Создаем геометрическую точку для местоположения образца, если известны координаты
             if (dto.Latitude.HasValue && dto.Longitude.HasValue)
             {
-                entity.Location = new Point((double)dto.Longitude.Value, (double)dto.Latitude.Value) 
-                { 
-                    SRID = 4326 // WGS84
-                };
+                entity.Location = new Point(((double)dto.Longitude.Value), ((double)dto.Latitude.Value)) { SRID = 4326 };
+            }
+            // Если есть WKT-представление, попробуем создать точку из него
+            else if (!string.IsNullOrEmpty(dto.LocationWkt))
+            {
+                try
+                {
+                    var geometry = _wktReader.Read(dto.LocationWkt);
+                    if (geometry is Point point)
+                    {
+                        point.SRID = 4326; // WGS 84
+                        entity.Location = point;
+                        // Обновляем также Latitude и Longitude
+                        entity.Latitude = (decimal)point.Y;
+                        entity.Longitude = (decimal)point.X;
+                    }
+                }
+                catch
+                {
+                    // В случае ошибки при чтении WKT, оставляем Location как null
+                    entity.Location = null;
+                }
             }
             else
             {

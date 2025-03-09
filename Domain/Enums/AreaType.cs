@@ -3,28 +3,44 @@ using System;
 namespace BGarden.DB.Domain.Enums
 {
     /// <summary>
-    /// Типы областей на карте ботанического сада
+    /// Типы зон на карте
     /// </summary>
+    [Flags]
     public enum AreaType
     {
         /// <summary>
-        /// Сектор
+        /// Неопределенный тип
         /// </summary>
-        Sector,
-        
+        Undefined = 0,
+
         /// <summary>
         /// Экспозиция
         /// </summary>
-        Exposition,
-        
+        Exposition = 1,
+
         /// <summary>
-        /// Оранжерея
+        /// Сектор
         /// </summary>
-        Greenhouse,
-        
+        Sector = 2,
+
         /// <summary>
-        /// Зона ограниченного доступа
+        /// Зона обслуживания
         /// </summary>
-        Restricted
+        Service = 4,
+
+        /// <summary>
+        /// Территория
+        /// </summary>
+        Territory = 8,
+
+        /// <summary>
+        /// Тропа
+        /// </summary>
+        Path = 16,
+
+        /// <summary>
+        /// Водоем
+        /// </summary>
+        Water = 32
     }
 } 

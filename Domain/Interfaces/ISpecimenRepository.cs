@@ -25,5 +25,12 @@ namespace BGarden.Domain.Interfaces
         /// <param name="sectorType">Тип сектора (дендрология, флора, цветоводство)</param>
         /// <returns>Коллекция образцов, относящихся к указанному типу сектора</returns>
         Task<IEnumerable<Specimen>> GetSpecimensBySectorTypeAsync(SectorType sectorType);
+
+        /// <summary>
+        /// Получает образец по идентификатору с включением связанных данных (семейство, экспозиция, биометрия, фенология).
+        /// </summary>
+        /// <param name="id">Идентификатор образца</param>
+        /// <returns>Образец с загруженными связанными данными</returns>
+        Task<Specimen?> GetByIdWithDetailsAsync(int id);
     }
 } 

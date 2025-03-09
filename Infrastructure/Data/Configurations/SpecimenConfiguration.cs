@@ -28,20 +28,17 @@ namespace BGarden.Infrastructure.Data.Configurations
             builder.Property(s => s.Longitude)
                    .HasColumnType("decimal(9,6)");
 
-            // Игнорируем пространственное поле Location в базе данных
-            builder.Ignore(s => s.Location);
+            // Настраиваем пространственное поле Location в базе данных
+            builder.Property(s => s.Location)
+                   .HasColumnType("geometry(Point,4326)");
 
             // Индекс для ускорения поиска по координатам (без фильтра, который создает проблемы)
             builder.HasIndex(s => new { s.Latitude, s.Longitude })
                    .HasDatabaseName("IX_Specimen_Coordinates");
             
-            // Убираем фильтр, который вызывает проблемы в PostgreSQL
-            // .HasFilter("[Latitude] IS NOT NULL AND [Longitude] IS NOT NULL");
-
-            // Убираем пространственный индекс для поля Location
-            // builder.HasIndex(s => s.Location)
-            //        .HasMethod("SPATIAL")
-            //        .HasDatabaseName("IX_Specimen_Location_Spatial");
+            // Добавляем пространственный индекс для поля Location
+            builder.HasIndex(s => s.Location)
+                   .HasDatabaseName("IX_Specimen_Location_Spatial");
 
             // Связь с Region (Many-to-One)
             builder.HasOne(s => s.Region)

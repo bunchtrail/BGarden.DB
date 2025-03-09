@@ -8,7 +8,8 @@ namespace BGarden.Infrastructure.Data
         public BotanicalContext CreateDbContext(string[] args)
         {
             var optionsBuilder = new DbContextOptionsBuilder<BotanicalContext>();
-            optionsBuilder.UseNpgsql(ConnectionString.PostgreSQL);
+            optionsBuilder.UseNpgsql(ConnectionString.PostgreSQL, 
+                options => options.UseNetTopologySuite());
 
             return new BotanicalContext(optionsBuilder.Options);
         }

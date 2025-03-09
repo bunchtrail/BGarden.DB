@@ -9,33 +9,41 @@ using BGarden.Application.UseCases;
 using BGarden.Application.UseCases.Interfaces;
 using BGarden.Domain.Interfaces;
 using System;
+using Application.Interfaces.Map;
+using BGarden.Application.Services.Map;
+using Application.Services.Map;
 
-namespace Application
+namespace BGarden.Application
 {
+    /// <summary>
+    /// Класс для настройки внедрения зависимостей в слое Application
+    /// </summary>
     public static class DependencyInjection
     {
+        /// <summary>
+        /// Метод расширения для добавления служб уровня приложения
+        /// </summary>
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
             if (services == null)
                 throw new ArgumentNullException(nameof(services));
 
-            // Регистрируем сервисы
+            // Регистрация сервисов
+            services.AddScoped<IUserService, UserService>();
             services.AddScoped<ISpecimenService, SpecimenService>();
             services.AddScoped<IFamilyService, FamilyService>();
             services.AddScoped<IExpositionService, ExpositionService>();
-            services.AddScoped<IBiometryService, BiometryService>();
             services.AddScoped<IPhenologyService, PhenologyService>();
+            services.AddScoped<IBiometryService, BiometryService>();
             services.AddScoped<IRegionService, RegionService>();
-            services.AddScoped<IUserService, UserService>();
             
-            // Регистрируем UseCase'ы
-            services.AddScoped<CreateSpecimenUseCase>();
-            // Другие use cases по мере необходимости
-            
-            // Регистрируем сервисы аутентификации
+            // Сервисы для работы с картой
+            services.AddScoped<IMapService, MapService>();
+            services.AddScoped<IMapTileService, MapTileService>();
+
+            // Регистрация вариантов использования
             services.AddScoped<IAuthUseCase, AuthUseCase>();
-            
-            // Примечание: IJwtService теперь регистрируется в API слое
+            services.AddScoped<CreateSpecimenUseCase>();
             
             return services;
         }

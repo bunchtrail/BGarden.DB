@@ -29,6 +29,8 @@ namespace BGarden.Infrastructure.Data
         // Сущности для модуля карты
         public DbSet<MapMarker> MapMarkers { get; set; } = null!;
         public DbSet<MapOptions> MapOptions { get; set; } = null!;
+        public DbSet<MapLayer> MapLayers { get; set; } = null!;
+        public DbSet<MapTileMetadata> MapTileMetadata { get; set; } = null!;
 
         // Переопределим OnModelCreating, чтобы применить конфигурации
         protected override void OnModelCreating(ModelBuilder modelBuilder)

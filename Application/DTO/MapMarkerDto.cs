@@ -47,6 +47,21 @@ namespace BGarden.DB.Application.DTO
         /// Идентификатор экземпляра растения (опциональный)
         /// </summary>
         public int? SpecimenId { get; set; }
+        
+        /// <summary>
+        /// Идентификатор региона, в котором находится маркер (опциональный)
+        /// </summary>
+        public int? RegionId { get; set; }
+        
+        /// <summary>
+        /// Дата создания маркера
+        /// </summary>
+        public DateTime CreatedAt { get; set; }
+        
+        /// <summary>
+        /// Дата последнего обновления маркера
+        /// </summary>
+        public DateTime UpdatedAt { get; set; }
     }
 
     /// <summary>
