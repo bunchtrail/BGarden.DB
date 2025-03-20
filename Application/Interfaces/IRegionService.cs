@@ -55,5 +55,13 @@ namespace Application.Interfaces
         /// Получить все образцы (Specimen) в указанном регионе.
         /// </summary>
         Task<IEnumerable<SpecimenDto>> GetSpecimensInRegionAsync(int regionId);
+
+        /// <summary>
+        /// Обновляет количество образцов в регионе (увеличивает или уменьшает на 1).
+        /// </summary>
+        /// <param name="regionId">Идентификатор региона</param>
+        /// <param name="increment">True для увеличения, False для уменьшения</param>
+        /// <returns>True, если обновление успешно, False, если регион не найден</returns>
+        Task<bool> UpdateSpecimensCountAsync(int regionId, bool increment);
     }
 } 

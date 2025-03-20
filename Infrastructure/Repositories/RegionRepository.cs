@@ -22,6 +22,7 @@ namespace BGarden.Infrastructure.Repositories
         public async Task<IEnumerable<Region>> GetAllRegionsAsync()
         {
             return await _context.Regions
+                .Include(r => r.Specimens)
                 .AsNoTracking()
                 .ToListAsync();
         }

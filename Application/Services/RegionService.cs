@@ -105,5 +105,26 @@ namespace Application.Services
             var regions = await _unitOfWork.Regions.FindNearbyRegionsAsync(latitude, longitude, radiusInMeters);
             return regions.Select(r => r.ToDto()).ToList();
         }
+
+        /// <inheritdoc/>
+        public async Task<bool> UpdateSpecimensCountAsync(int regionId, bool increment)
+        {
+            var region = await _unitOfWork.Regions.GetRegionByIdAsync(regionId);
+            if (region == null)
+            {
+                return false;
+            }
+
+            // Обновляем время изменения для обновления кеша
+            region.UpdatedAt = DateTime.UtcNow;
+            
+            // Перезагружаем коллекцию Specimens из базы данных
+            region.Specimens = (await _unitOfWork.Specimens.GetSpecimensByRegionIdAsync(regionId)).ToList();
+            
+            _unitOfWork.Regions.Update(region);
+            await _unitOfWork.SaveChangesAsync();
+            
+            return true;
+        }
     }
 } 

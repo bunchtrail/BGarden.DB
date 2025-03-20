@@ -87,6 +87,9 @@ namespace BGarden.Infrastructure.Repositories
                 await InvalidateRegionCacheAsync(entity.RegionId.Value);
                 
             await InvalidateSectorTypeCacheAsync(entity.SectorType);
+            
+            // Инвалидируем общий кеш всех образцов
+            await _cacheService.RemoveAsync($"{CacheKeyPrefix}All");
         }
 
         public override void Update(Specimen entity)
