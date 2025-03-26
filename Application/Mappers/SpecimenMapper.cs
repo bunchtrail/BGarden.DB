@@ -25,6 +25,9 @@ namespace Application.Mappers
                 SectorType = entity.SectorType,
                 Latitude = entity.Latitude,
                 Longitude = entity.Longitude,
+                MapId = entity.MapId,
+                MapX = entity.MapX,
+                MapY = entity.MapY,
                 RegionId = entity.RegionId,
                 RegionName = entity.Region?.Name,
                 FamilyId = entity.FamilyId,
@@ -75,6 +78,9 @@ namespace Application.Mappers
                 SectorType = dto.SectorType,
                 Latitude = dto.Latitude,
                 Longitude = dto.Longitude,
+                MapId = dto.MapId,
+                MapX = dto.MapX,
+                MapY = dto.MapY,
                 RegionId = dto.RegionId,
                 FamilyId = dto.FamilyId,
                 RussianName = dto.RussianName,
@@ -142,6 +148,9 @@ namespace Application.Mappers
             entity.SectorType = dto.SectorType;
             entity.Latitude = dto.Latitude;
             entity.Longitude = dto.Longitude;
+            entity.MapId = dto.MapId;
+            entity.MapX = dto.MapX;
+            entity.MapY = dto.MapY;
             entity.RegionId = dto.RegionId;
             entity.FamilyId = dto.FamilyId;
             entity.RussianName = dto.RussianName;

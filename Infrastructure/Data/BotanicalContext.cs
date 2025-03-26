@@ -29,6 +29,9 @@ namespace BGarden.Infrastructure.Data
         
         // Сущность для работы с картами
         public DbSet<Map> Maps { get; set; } = null!;
+        
+        // Сущность для работы с изображениями образцов
+        public DbSet<SpecimenImage> SpecimenImages { get; set; } = null!;
 
         // Переопределим OnModelCreating, чтобы применить конфигурации
         protected override void OnModelCreating(ModelBuilder modelBuilder)

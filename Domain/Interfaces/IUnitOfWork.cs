@@ -17,7 +17,23 @@ namespace BGarden.Domain.Interfaces
         IRegionRepository Regions { get; }
         IUserRepository Users { get; }
         IMapRepository Maps { get; }
+        ISpecimenImageRepository SpecimenImages { get; }
 
         Task<int> SaveChangesAsync();
+        
+        /// <summary>
+        /// Начинает транзакцию
+        /// </summary>
+        Task BeginTransactionAsync();
+        
+        /// <summary>
+        /// Фиксирует изменения, внесенные в рамках транзакции
+        /// </summary>
+        Task CommitTransactionAsync();
+        
+        /// <summary>
+        /// Отменяет изменения, внесенные в рамках транзакции
+        /// </summary>
+        Task RollbackTransactionAsync();
     }
 } 

@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Storage;
 
 using BGarden.Domain.Interfaces;
 using BGarden.Infrastructure.Data;
@@ -17,7 +18,9 @@ namespace BGarden.Infrastructure.Repositories
         private readonly IRegionRepository _regionRepository;
         private readonly IUserRepository _userRepository;
         private readonly IMapRepository _mapRepository;
+        private readonly ISpecimenImageRepository _specimenImageRepository;
         private bool _disposed = false;
+        private IDbContextTransaction _transaction;
 
         public UnitOfWork(
             BotanicalContext context,
@@ -28,7 +31,8 @@ namespace BGarden.Infrastructure.Repositories
             IPhenologyRepository phenologyRepository,
             IRegionRepository regionRepository,
             IUserRepository userRepository,
-            IMapRepository mapRepository)
+            IMapRepository mapRepository,
+            ISpecimenImageRepository specimenImageRepository)
         {
             _context = context;
             _specimenRepository = specimenRepository;
@@ -39,6 +43,7 @@ namespace BGarden.Infrastructure.Repositories
             _regionRepository = regionRepository;
             _userRepository = userRepository;
             _mapRepository = mapRepository;
+            _specimenImageRepository = specimenImageRepository;
         }
 
         public ISpecimenRepository Specimens => _specimenRepository;
@@ -49,10 +54,42 @@ namespace BGarden.Infrastructure.Repositories
         public IRegionRepository Regions => _regionRepository;
         public IUserRepository Users => _userRepository;
         public IMapRepository Maps => _mapRepository;
+        public ISpecimenImageRepository SpecimenImages => _specimenImageRepository;
 
         public async Task<int> SaveChangesAsync()
         {
             return await _context.SaveChangesAsync();
+        }
+
+        public async Task BeginTransactionAsync()
+        {
+            _transaction = await _context.Database.BeginTransactionAsync();
+        }
+
+        public async Task CommitTransactionAsync()
+        {
+            try
+            {
+                await _transaction.CommitAsync();
+            }
+            finally
+            {
+                await _transaction.DisposeAsync();
+                _transaction = null;
+            }
+        }
+
+        public async Task RollbackTransactionAsync()
+        {
+            try
+            {
+                await _transaction.RollbackAsync();
+            }
+            finally
+            {
+                await _transaction.DisposeAsync();
+                _transaction = null;
+            }
         }
 
         protected virtual void Dispose(bool disposing)
@@ -61,6 +98,7 @@ namespace BGarden.Infrastructure.Repositories
             {
                 if (disposing)
                 {
+                    _transaction?.Dispose();
                     _context.Dispose();
                 }
                 _disposed = true;

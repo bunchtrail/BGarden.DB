@@ -7,6 +7,7 @@ using BGarden.Infrastructure.Repositories;
 using BGarden.Infrastructure.Services;
 
 using Microsoft.Extensions.Logging;
+using Infrastructure.Repositories;
 
 namespace BGarden.Infrastructure
 {
@@ -40,6 +41,7 @@ namespace BGarden.Infrastructure
             services.AddScoped<IRegionRepository, RegionRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IMapRepository, MapRepository>();
+            services.AddScoped<ISpecimenImageRepository, SpecimenImageRepository>();
             
             // Регистрируем декораторы с кэшированием
             services.AddScoped<ISpecimenRepository>(provider => new CachedSpecimenRepository(

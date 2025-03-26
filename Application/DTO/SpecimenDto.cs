@@ -28,6 +28,21 @@ namespace Application.DTO
         public string? LocationWkt { get; set; }
 
         /// <summary>
+        /// Идентификатор карты, на которой размещено растение
+        /// </summary>
+        public int? MapId { get; set; }
+        
+        /// <summary>
+        /// Координата X на карте (в пикселях)
+        /// </summary>
+        public int? MapX { get; set; }
+        
+        /// <summary>
+        /// Координата Y на карте (в пикселях)
+        /// </summary>
+        public int? MapY { get; set; }
+
+        /// <summary>
         /// Идентификатор области (региона), в которой находится растение
         /// </summary>
         public int? RegionId { get; set; }

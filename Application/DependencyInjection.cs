@@ -34,10 +34,12 @@ namespace BGarden.Application
             services.AddScoped<IBiometryService, BiometryService>();
             services.AddScoped<IRegionService, RegionService>();
             services.AddScoped<IMapService, MapService>();
+            services.AddScoped<ISpecimenImageService, SpecimenImageService>();
 
             // Регистрация вариантов использования
             services.AddScoped<IAuthUseCase, AuthUseCase>();
             services.AddScoped<CreateSpecimenUseCase>();
+            services.AddScoped<CreateSpecimenWithImagesUseCase>();
             
             return services;
         }

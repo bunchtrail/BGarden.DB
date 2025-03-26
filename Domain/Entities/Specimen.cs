@@ -214,5 +214,10 @@ namespace BGarden.Domain.Entities
         // Навигационные свойства для связи «один ко многим» со сторонними таблицами:
         public ICollection<Phenology>? Phenologies { get; set; }
         public ICollection<Biometry>? Biometries { get; set; }
+        
+        /// <summary>
+        /// Коллекция изображений, связанных с образцом
+        /// </summary>
+        public ICollection<SpecimenImage>? SpecimenImages { get; set; }
     }
 } 
