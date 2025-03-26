@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Application.DTO;
+using Application.Mappers;
 using BGarden.Domain.Entities;
 using BGarden.Domain.Enums;
 using BGarden.Domain.Interfaces;
@@ -123,12 +125,36 @@ namespace BGarden.Infrastructure.Repositories
                 {
                     _cacheService.RemoveAsync($"{CacheKeyPrefix}InventoryNumber_{oldEntity.InventoryNumber}").GetAwaiter().GetResult();
                 }
+                
+                // Проверяем изменение координат для инвалидации кэша местоположения
+                bool locationChanged = oldEntity.Latitude != entity.Latitude || 
+                                      oldEntity.Longitude != entity.Longitude ||
+                                      oldEntity.LocationType != entity.LocationType ||
+                                      oldEntity.MapId != entity.MapId ||
+                                      oldEntity.MapX != entity.MapX ||
+                                      oldEntity.MapY != entity.MapY;
+                                      
+                if (locationChanged)
+                {
+                    // Инвалидируем кэш для пространственных запросов и фильтров с координатами
+                    _logger.LogInformation($"Обнаружено изменение координат у образца {entity.Id}, инвалидация пространственных кэшей");
+                    
+                    // Инвалидируем кэш для фильтрованных запросов, которые могут включать этот образец
+                    InvalidateAllFilteredCaches();
+                    
+                    // Инвалидируем кэш для запросов в текущем регионе
+                    if (entity.RegionId.HasValue)
+                        _cacheService.RemoveAsync($"{CacheKeyPrefix}ByRegion_{entity.RegionId.Value}").GetAwaiter().GetResult();
+                }
             }
             
             _cacheService.RemoveAsync($"{CacheKeyPrefix}InventoryNumber_{entity.InventoryNumber}").GetAwaiter().GetResult();
             
             // Инвалидируем общий кэш
             _cacheService.RemoveAsync($"{CacheKeyPrefix}All").GetAwaiter().GetResult();
+            
+            // Гарантируем, что кэш конкретной сущности полностью сброшен
+            _cacheService.RemoveAsync($"{CacheKeyPrefix}{entity.Id}").GetAwaiter().GetResult();
         }
 
         public override void Remove(Specimen entity)
@@ -182,6 +208,110 @@ namespace BGarden.Infrastructure.Repositories
             return await _cacheService.GetOrCreateAsync(cacheKey, 
                 async () => await _specimenRepository.GetFilteredSpecimensAsync(name, familyId, regionId),
                 DefaultCacheTime);
+        }
+
+        // Добавляем новый метод для инвалидации всех фильтрованных кэшей
+        private void InvalidateAllFilteredCaches()
+        {
+            // Используем новый метод для удаления кэшей по шаблону
+            _logger.LogInformation("Инвалидация всех фильтрованных кэшей для обеспечения согласованности данных");
+            
+            // Удаляем все кэши, содержащие "Filtered"
+            _cacheService.RemoveByPatternAsync($"{CacheKeyPrefix}Filtered").GetAwaiter().GetResult();
+            
+            // Удаляем все кэши, связанные с координатами
+            _cacheService.RemoveByPatternAsync("Location").GetAwaiter().GetResult();
+            _cacheService.RemoveByPatternAsync("BoundingBox").GetAwaiter().GetResult();
+            
+            // Инвалидируем общий кэш также
+            _cacheService.RemoveAsync($"{CacheKeyPrefix}All").GetAwaiter().GetResult();
+        }
+
+        // Переопределим метод UpdateSpecimenLocationAsync для прямой работы с репозиторием
+        // и явной инвалидации связанных кэшей
+        public async Task<SpecimenDto?> UpdateSpecimenLocationAsync(int id, SpecimenDto locationDto)
+        {
+            // Получаем существующий образец
+            var specimen = await _specimenRepository.GetByIdAsync(id);
+            if (specimen == null)
+            {
+                _logger.LogWarning("Образец с ID {Id} не найден при попытке обновления местоположения", id);
+                return null;
+            }
+            
+            // Обновляем координаты в зависимости от выбранного типа
+            switch (locationDto.LocationType)
+            {
+                case BGarden.Domain.Enums.LocationType.Geographic:
+                    if (!locationDto.Latitude.HasValue || !locationDto.Longitude.HasValue)
+                    {
+                        _logger.LogError("При использовании географических координат должны быть указаны широта и долгота");
+                        throw new ArgumentException("При использовании географических координат должны быть указаны широта и долгота");
+                    }
+                    specimen.SetGeographicCoordinates(locationDto.Latitude.Value, locationDto.Longitude.Value);
+                    break;
+                    
+                case BGarden.Domain.Enums.LocationType.SchematicMap:
+                    if (!locationDto.MapId.HasValue || !locationDto.MapX.HasValue || !locationDto.MapY.HasValue)
+                    {
+                        _logger.LogError("При использовании схематической карты должны быть указаны идентификатор карты и координаты X, Y");
+                        throw new ArgumentException("При использовании схематической карты должны быть указаны идентификатор карты и координаты X, Y");
+                    }
+                    specimen.SetSchematicCoordinates(locationDto.MapId.Value, locationDto.MapX.Value, locationDto.MapY.Value);
+                    break;
+                    
+                case BGarden.Domain.Enums.LocationType.None:
+                    specimen.ClearCoordinates();
+                    break;
+            }
+            
+            specimen.LastUpdatedAt = DateTime.UtcNow;
+            
+            // Обновляем объект в репозитории
+            _specimenRepository.Update(specimen);
+            
+            try
+            {
+                // Получаем текущий UnitOfWork через статический метод
+                var unitOfWork = UnitOfWork.GetUnitOfWork();
+                if (unitOfWork != null)
+                {
+                    await unitOfWork.SaveChangesAsync();
+                    _logger.LogInformation("Изменения местоположения сохранены в базе данных для образца {Id}", id);
+                }
+                else
+                {
+                    _logger.LogWarning("Не удалось получить UnitOfWork для сохранения изменений местоположения образца {Id}", id);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Ошибка при сохранении изменений местоположения для образца {Id}", id);
+            }
+            
+            // Явная инвалидация всех связанных кэшей при обновлении местоположения
+            _logger.LogInformation("Явная инвалидация кэшей при обновлении местоположения для образца {SpecimenId}", id);
+            
+            // Удаляем кэш конкретного образца
+            await _cacheService.RemoveAsync($"{CacheKeyPrefix}WithDetails_{id}");
+            
+            // Удаляем все кэши с фильтрацией
+            await _cacheService.RemoveByPatternAsync($"{CacheKeyPrefix}Filtered");
+            
+            // Удаляем кэши, связанные с пространственными запросами
+            await _cacheService.RemoveByPatternAsync("BoundingBox");
+            
+            // Удаляем кэш для региона, если он указан
+            if (specimen.RegionId.HasValue)
+            {
+                await _cacheService.RemoveAsync($"{CacheKeyPrefix}ByRegion_{specimen.RegionId.Value}");
+            }
+            
+            // Удаляем общий кэш
+            await _cacheService.RemoveAsync($"{CacheKeyPrefix}All");
+            
+            // Возвращаем DTO
+            return SpecimenMapper.ToDto(specimen);
         }
     }
 } 

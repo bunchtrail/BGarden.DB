@@ -43,5 +43,12 @@ namespace BGarden.Domain.Interfaces
         /// <param name="expirationTime">Время жизни кэша</param>
         /// <returns>Значение из кэша или новое созданное значение</returns>
         Task<T> GetOrCreateAsync<T>(string key, Func<Task<T>> factory, TimeSpan expirationTime) where T : class;
+        
+        /// <summary>
+        /// Удаляет все кэши, ключи которых содержат указанный шаблон
+        /// </summary>
+        /// <param name="pattern">Шаблон для поиска ключей (подстрока)</param>
+        /// <returns>Количество удаленных ключей</returns>
+        Task<int> RemoveByPatternAsync(string pattern);
     }
 } 

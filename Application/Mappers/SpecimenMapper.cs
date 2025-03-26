@@ -23,8 +23,10 @@ namespace Application.Mappers
                 Id = entity.Id,
                 InventoryNumber = entity.InventoryNumber,
                 SectorType = entity.SectorType,
+                LocationType = entity.LocationType,
                 Latitude = entity.Latitude,
                 Longitude = entity.Longitude,
+                LocationWkt = entity.Location?.AsText(),
                 MapId = entity.MapId,
                 MapX = entity.MapX,
                 MapY = entity.MapY,
@@ -74,14 +76,10 @@ namespace Application.Mappers
         {
             var entity = new Specimen
             {
+                Id = dto.Id,
                 InventoryNumber = dto.InventoryNumber,
                 SectorType = dto.SectorType,
-                Latitude = dto.Latitude,
-                Longitude = dto.Longitude,
-                MapId = dto.MapId,
-                MapX = dto.MapX,
-                MapY = dto.MapY,
-                RegionId = dto.RegionId,
+                LocationType = dto.LocationType,
                 FamilyId = dto.FamilyId,
                 RussianName = dto.RussianName,
                 LatinName = dto.LatinName,
@@ -109,31 +107,24 @@ namespace Application.Mappers
                 CreatedAt = DateTime.UtcNow
             };
 
-            // Создаем геометрическую точку для местоположения образца, если известны координаты
-            if (dto.Latitude.HasValue && dto.Longitude.HasValue)
+            // Устанавливаем координаты в зависимости от типа
+            switch (dto.LocationType)
             {
-                entity.Location = new Point(((double)dto.Longitude.Value), ((double)dto.Latitude.Value)) { SRID = 4326 };
-            }
-            // Если есть WKT-представление, попробуем создать точку из него
-            else if (!string.IsNullOrEmpty(dto.LocationWkt))
-            {
-                try
-                {
-                    var geometry = _wktReader.Read(dto.LocationWkt);
-                    if (geometry is Point point)
+                case BGarden.Domain.Enums.LocationType.Geographic:
+                    if (dto.Latitude.HasValue && dto.Longitude.HasValue)
                     {
-                        point.SRID = 4326; // WGS 84
-                        entity.Location = point;
-                        // Обновляем также Latitude и Longitude
-                        entity.Latitude = (decimal)point.Y;
-                        entity.Longitude = (decimal)point.X;
+                        entity.SetGeographicCoordinates(dto.Latitude.Value, dto.Longitude.Value);
                     }
-                }
-                catch
-                {
-                    // В случае ошибки при чтении WKT, оставляем Location как null
-                    entity.Location = null;
-                }
+                    break;
+                case BGarden.Domain.Enums.LocationType.SchematicMap:
+                    if (dto.MapId.HasValue && dto.MapX.HasValue && dto.MapY.HasValue)
+                    {
+                        entity.SetSchematicCoordinates(dto.MapId.Value, dto.MapX.Value, dto.MapY.Value);
+                    }
+                    break;
+                default:
+                    entity.ClearCoordinates();
+                    break;
             }
 
             return entity;
@@ -146,11 +137,27 @@ namespace Application.Mappers
         {
             entity.InventoryNumber = dto.InventoryNumber;
             entity.SectorType = dto.SectorType;
-            entity.Latitude = dto.Latitude;
-            entity.Longitude = dto.Longitude;
-            entity.MapId = dto.MapId;
-            entity.MapX = dto.MapX;
-            entity.MapY = dto.MapY;
+            
+            // Обновляем координаты в зависимости от типа
+            switch (dto.LocationType)
+            {
+                case BGarden.Domain.Enums.LocationType.Geographic:
+                    if (dto.Latitude.HasValue && dto.Longitude.HasValue)
+                    {
+                        entity.SetGeographicCoordinates(dto.Latitude.Value, dto.Longitude.Value);
+                    }
+                    break;
+                case BGarden.Domain.Enums.LocationType.SchematicMap:
+                    if (dto.MapId.HasValue && dto.MapX.HasValue && dto.MapY.HasValue)
+                    {
+                        entity.SetSchematicCoordinates(dto.MapId.Value, dto.MapX.Value, dto.MapY.Value);
+                    }
+                    break;
+                default:
+                    entity.ClearCoordinates();
+                    break;
+            }
+            
             entity.RegionId = dto.RegionId;
             entity.FamilyId = dto.FamilyId;
             entity.RussianName = dto.RussianName;
@@ -177,37 +184,6 @@ namespace Application.Mappers
             entity.Notes = dto.Notes;
             entity.FilledBy = dto.FilledBy;
             entity.LastUpdatedAt = DateTime.UtcNow;
-
-            // Создаем геометрическую точку для местоположения образца, если известны координаты
-            if (dto.Latitude.HasValue && dto.Longitude.HasValue)
-            {
-                entity.Location = new Point(((double)dto.Longitude.Value), ((double)dto.Latitude.Value)) { SRID = 4326 };
-            }
-            // Если есть WKT-представление, попробуем создать точку из него
-            else if (!string.IsNullOrEmpty(dto.LocationWkt))
-            {
-                try
-                {
-                    var geometry = _wktReader.Read(dto.LocationWkt);
-                    if (geometry is Point point)
-                    {
-                        point.SRID = 4326; // WGS 84
-                        entity.Location = point;
-                        // Обновляем также Latitude и Longitude
-                        entity.Latitude = (decimal)point.Y;
-                        entity.Longitude = (decimal)point.X;
-                    }
-                }
-                catch
-                {
-                    // В случае ошибки при чтении WKT, оставляем Location как null
-                    entity.Location = null;
-                }
-            }
-            else
-            {
-                entity.Location = null;
-            }
         }
     }
 } 

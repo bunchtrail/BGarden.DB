@@ -12,6 +12,11 @@ namespace Application.DTO
         public BGarden.Domain.Enums.SectorType SectorType { get; set; }
         
         /// <summary>
+        /// Тип используемых координат
+        /// </summary>
+        public BGarden.Domain.Enums.LocationType LocationType { get; set; } = BGarden.Domain.Enums.LocationType.None;
+        
+        /// <summary>
         /// Координаты местоположения растения (широта)
         /// </summary>
         public decimal? Latitude { get; set; }
@@ -35,12 +40,12 @@ namespace Application.DTO
         /// <summary>
         /// Координата X на карте (в пикселях)
         /// </summary>
-        public int? MapX { get; set; }
+        public decimal? MapX { get; set; }
         
         /// <summary>
         /// Координата Y на карте (в пикселях)
         /// </summary>
-        public int? MapY { get; set; }
+        public decimal? MapY { get; set; }
 
         /// <summary>
         /// Идентификатор области (региона), в которой находится растение

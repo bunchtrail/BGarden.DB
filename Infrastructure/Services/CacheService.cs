@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using BGarden.Domain.Interfaces;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 
 namespace BGarden.Infrastructure.Services
 {
@@ -65,18 +66,74 @@ namespace BGarden.Infrastructure.Services
         }
 
         /// <inheritdoc/>
-        public Task<bool> RemoveAsync(string key)
+        public async Task<bool> RemoveAsync(string key)
         {
             try
             {
                 _memoryCache.Remove(key);
                 _logger.LogDebug("Значение удалено из кэша по ключу: {Key}", key);
-                return Task.FromResult(true);
+                return true;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Ошибка при удалении значения из кэша для ключа: {Key}", key);
-                return Task.FromResult(false);
+                return false;
+            }
+        }
+
+        /// <inheritdoc/>
+        public async Task<int> RemoveByPatternAsync(string pattern)
+        {
+            try
+            {
+                // К сожалению, в IMemoryCache нет прямого API для получения всех ключей
+                // Это реализация для MemoryCache на основе рефлексии
+                // Она может перестать работать в будущих версиях .NET, но сейчас это лучшее решение
+                var count = 0;
+                
+                // Используем свойство EntriesCollection через рефлексию для доступа к внутренним данным
+                var cacheEntriesCollectionDefinition = typeof(MemoryCache).GetProperty(
+                    "EntriesCollection", 
+                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                
+                if (cacheEntriesCollectionDefinition != null)
+                {
+                    var cacheEntriesCollection = cacheEntriesCollectionDefinition.GetValue(_memoryCache) as dynamic;
+                    if (cacheEntriesCollection != null)
+                    {
+                        List<string> keysToRemove = new List<string>();
+                        
+                        // Находим ключи, соответствующие шаблону
+                        foreach (dynamic entry in cacheEntriesCollection)
+                        {
+                            string cacheKey = entry.Key?.ToString();
+                            if (cacheKey != null && cacheKey.Contains(pattern))
+                            {
+                                keysToRemove.Add(cacheKey);
+                            }
+                        }
+                        
+                        // Удаляем найденные ключи
+                        foreach (var keyToRemove in keysToRemove)
+                        {
+                            _memoryCache.Remove(keyToRemove);
+                            count++;
+                        }
+                        
+                        _logger.LogInformation("Удалено {Count} записей кэша, соответствующих шаблону: {Pattern}", count, pattern);
+                    }
+                }
+                else
+                {
+                    _logger.LogWarning("Не удалось получить доступ к EntriesCollection для удаления кэшей по шаблону");
+                }
+                
+                return count;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Ошибка при удалении кэшей по шаблону: {Pattern}", pattern);
+                return 0;
             }
         }
 

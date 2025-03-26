@@ -1,12 +1,14 @@
 using Domain.Entities;
 using NetTopologySuite.Geometries;
-
+using BGarden.Domain.Enums;
+using BGarden.Domain.Validation;
 
 namespace BGarden.Domain.Entities
 {
     /// <summary>
     /// Основная сущность, описывающая образец (растение) в коллекции.
     /// </summary>
+    [ValidCoordinates]
     public class Specimen
     {
         /// <summary>
@@ -204,12 +206,17 @@ namespace BGarden.Domain.Entities
         /// <summary>
         /// Координата X на карте (в пикселях)
         /// </summary>
-        public int? MapX { get; set; }
+        public decimal? MapX { get; set; }
         
         /// <summary>
         /// Координата Y на карте (в пикселях)
         /// </summary>
-        public int? MapY { get; set; }
+        public decimal? MapY { get; set; }
+
+        /// <summary>
+        /// Тип используемых координат
+        /// </summary>
+        public LocationType LocationType { get; set; } = LocationType.None;
 
         // Навигационные свойства для связи «один ко многим» со сторонними таблицами:
         public ICollection<Phenology>? Phenologies { get; set; }
@@ -219,5 +226,51 @@ namespace BGarden.Domain.Entities
         /// Коллекция изображений, связанных с образцом
         /// </summary>
         public ICollection<SpecimenImage>? SpecimenImages { get; set; }
+
+        /// <summary>
+        /// Устанавливает географические координаты и сбрасывает схематические
+        /// </summary>
+        public void SetGeographicCoordinates(decimal latitude, decimal longitude)
+        {
+            Latitude = latitude;
+            Longitude = longitude;
+            Location = new Point((double)longitude, (double)latitude) { SRID = 4326 };
+            LocationType = LocationType.Geographic;
+            
+            // Сбрасываем координаты схематической карты
+            MapId = null;
+            MapX = null;
+            MapY = null;
+        }
+        
+        /// <summary>
+        /// Устанавливает координаты на схематической карте и сбрасывает географические
+        /// </summary>
+        public void SetSchematicCoordinates(int mapId, decimal x, decimal y)
+        {
+            MapId = mapId;
+            MapX = x;
+            MapY = y;
+            LocationType = LocationType.SchematicMap;
+            
+            // Сбрасываем географические координаты
+            Latitude = null;
+            Longitude = null;
+            Location = null;
+        }
+        
+        /// <summary>
+        /// Очищает все координаты
+        /// </summary>
+        public void ClearCoordinates()
+        {
+            Latitude = null;
+            Longitude = null;
+            Location = null;
+            MapId = null;
+            MapX = null;
+            MapY = null;
+            LocationType = LocationType.None;
+        }
     }
 } 

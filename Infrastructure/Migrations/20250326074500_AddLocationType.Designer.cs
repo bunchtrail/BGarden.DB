@@ -3,6 +3,7 @@ using System;
 using BGarden.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(BotanicalContext))]
-    partial class BotanicalContextModelSnapshot : ModelSnapshot
+    [Migration("20250326074500_AddLocationType")]
+    partial class AddLocationType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -400,11 +403,11 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("MapId")
                         .HasColumnType("integer");
 
-                    b.Property<decimal?>("MapX")
-                        .HasColumnType("numeric");
+                    b.Property<int?>("MapX")
+                        .HasColumnType("integer");
 
-                    b.Property<decimal?>("MapY")
-                        .HasColumnType("numeric");
+                    b.Property<int?>("MapY")
+                        .HasColumnType("integer");
 
                     b.Property<string>("NaturalRange")
                         .HasMaxLength(250)

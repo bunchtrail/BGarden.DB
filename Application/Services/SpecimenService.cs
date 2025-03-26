@@ -115,15 +115,49 @@ namespace Application.Services
             return await CreateSpecimenAsync(specimenDto);
         }
         
+        public async Task<SpecimenDto?> UpdateSpecimenLocationAsync(int id, SpecimenDto locationDto)
+        {
+            var existing = await _unitOfWork.Specimens.GetByIdAsync(id);
+            if (existing == null) return null;
+            
+            // Обновляем координаты в зависимости от выбранного типа
+            switch (locationDto.LocationType)
+            {
+                case LocationType.Geographic:
+                    if (!locationDto.Latitude.HasValue || !locationDto.Longitude.HasValue)
+                    {
+                        throw new ArgumentException("При использовании географических координат должны быть указаны широта и долгота");
+                    }
+                    existing.SetGeographicCoordinates(locationDto.Latitude.Value, locationDto.Longitude.Value);
+                    break;
+                    
+                case LocationType.SchematicMap:
+                    if (!locationDto.MapId.HasValue || !locationDto.MapX.HasValue || !locationDto.MapY.HasValue)
+                    {
+                        throw new ArgumentException("При использовании схематической карты должны быть указаны идентификатор карты и координаты X, Y");
+                    }
+                    existing.SetSchematicCoordinates(locationDto.MapId.Value, locationDto.MapX.Value, locationDto.MapY.Value);
+                    break;
+                    
+                case LocationType.None:
+                    existing.ClearCoordinates();
+                    break;
+            }
+            
+            existing.LastUpdatedAt = DateTime.UtcNow;
+            await _unitOfWork.SaveChangesAsync();
+            
+            return existing.ToDto();
+        }
+        
+        // Устаревший метод, оставлен для обратной совместимости
         public async Task<SpecimenDto?> UpdateSpecimenLocationAsync(int id, decimal latitude, decimal longitude)
         {
             var existing = await _unitOfWork.Specimens.GetByIdAsync(id);
             if (existing == null) return null;
             
-            // Обновляем только координаты
-            existing.Latitude = latitude;
-            existing.Longitude = longitude;
-            existing.Location = new Point((double)longitude, (double)latitude) { SRID = 4326 };
+            // Используем новый метод для установки географических координат
+            existing.SetGeographicCoordinates(latitude, longitude);
             existing.LastUpdatedAt = DateTime.UtcNow;
             
             await _unitOfWork.SaveChangesAsync();

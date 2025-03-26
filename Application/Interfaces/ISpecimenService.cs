@@ -74,5 +74,13 @@ namespace Application.Interfaces
         /// <param name="longitude">Новая долгота</param>
         /// <returns>Обновленный экземпляр растения</returns>
         Task<SpecimenDto?> UpdateSpecimenLocationAsync(int id, decimal latitude, decimal longitude);
+        
+        /// <summary>
+        /// Обновляет местоположение образца с учетом типа координат
+        /// </summary>
+        /// <param name="id">Идентификатор образца</param>
+        /// <param name="locationDto">DTO с данными местоположения и типом координат</param>
+        /// <returns>Обновленный образец или null, если образец не найден</returns>
+        Task<SpecimenDto?> UpdateSpecimenLocationAsync(int id, SpecimenDto locationDto);
     }
 } 

@@ -133,6 +133,12 @@ namespace BGarden.Infrastructure.Data.Configurations
 
             // Связь с Phenology/ Biometry задается со стороны PhenologyConfiguration / BiometryConfiguration,
             // но можно и здесь, если хотим уточнить.
+
+            // Настройка поля LocationType с перечислением
+            builder.Property(s => s.LocationType)
+                .HasConversion<int>()
+                .HasDefaultValue(BGarden.Domain.Enums.LocationType.None)
+                .IsRequired();
         }
     }
 } 

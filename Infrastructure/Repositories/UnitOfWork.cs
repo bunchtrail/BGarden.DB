@@ -1,60 +1,91 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 using BGarden.Domain.Interfaces;
 using BGarden.Infrastructure.Data;
+using Infrastructure.Repositories;
 
 namespace BGarden.Infrastructure.Repositories
 {
+    /// <summary>
+    /// Реализация Unit of Work, которая управляет транзакциями и репозиториями.
+    /// </summary>
     public class UnitOfWork : IUnitOfWork
     {
         private readonly BotanicalContext _context;
-        private readonly ISpecimenRepository _specimenRepository;
-        private readonly IFamilyRepository _familyRepository;
-        private readonly IExpositionRepository _expositionRepository;
-        private readonly IBiometryRepository _biometryRepository;
-        private readonly IPhenologyRepository _phenologyRepository;
-        private readonly IRegionRepository _regionRepository;
-        private readonly IUserRepository _userRepository;
-        private readonly IMapRepository _mapRepository;
-        private readonly ISpecimenImageRepository _specimenImageRepository;
+        private readonly ILogger<UnitOfWork> _logger;
         private bool _disposed = false;
         private IDbContextTransaction _transaction;
+        
+        // Используем static для хранения последнего созданного экземпляра UnitOfWork
+        private static UnitOfWork _currentInstance;
+
+        private ISpecimenRepository _specimenRepository;
+        private IFamilyRepository _familyRepository;
+        private IExpositionRepository _expositionRepository;
+        private IBiometryRepository _biometryRepository;
+        private IPhenologyRepository _phenologyRepository;
+        private IRegionRepository _regionRepository;
+        private IUserRepository _userRepository;
+        private IMapRepository _mapRepository;
+        private ISpecimenImageRepository _specimenImageRepository;
 
         public UnitOfWork(
             BotanicalContext context,
-            ISpecimenRepository specimenRepository,
-            IFamilyRepository familyRepository,
-            IExpositionRepository expositionRepository,
-            IBiometryRepository biometryRepository,
-            IPhenologyRepository phenologyRepository,
-            IRegionRepository regionRepository,
-            IUserRepository userRepository,
-            IMapRepository mapRepository,
-            ISpecimenImageRepository specimenImageRepository)
+            ILogger<UnitOfWork> logger)
         {
             _context = context;
-            _specimenRepository = specimenRepository;
-            _familyRepository = familyRepository;
-            _expositionRepository = expositionRepository;
-            _biometryRepository = biometryRepository;
-            _phenologyRepository = phenologyRepository;
-            _regionRepository = regionRepository;
-            _userRepository = userRepository;
-            _mapRepository = mapRepository;
-            _specimenImageRepository = specimenImageRepository;
+            _logger = logger;
+            
+            // Сохраняем текущий экземпляр UnitOfWork
+            _currentInstance = this;
+        }
+        
+        /// <summary>
+        /// Получает текущий экземпляр UnitOfWork
+        /// </summary>
+        public static IUnitOfWork GetUnitOfWork()
+        {
+            return _currentInstance;
         }
 
-        public ISpecimenRepository Specimens => _specimenRepository;
-        public IFamilyRepository Families => _familyRepository;
-        public IExpositionRepository Expositions => _expositionRepository;
-        public IBiometryRepository Biometries => _biometryRepository;
-        public IPhenologyRepository Phenologies => _phenologyRepository;
-        public IRegionRepository Regions => _regionRepository;
-        public IUserRepository Users => _userRepository;
-        public IMapRepository Maps => _mapRepository;
-        public ISpecimenImageRepository SpecimenImages => _specimenImageRepository;
+        public ISpecimenRepository Specimens => 
+            _specimenRepository ??= new CachedSpecimenRepository(
+                new SpecimenRepository(_context),
+                new Infrastructure.Services.CacheService(
+                    new Microsoft.Extensions.Caching.Memory.MemoryCache(
+                        new Microsoft.Extensions.Caching.Memory.MemoryCacheOptions()),
+                    new Microsoft.Extensions.Logging.Abstractions.NullLogger<Infrastructure.Services.CacheService>()),
+                new Microsoft.Extensions.Logging.Abstractions.NullLogger<CachedSpecimenRepository>());
+
+        public IFamilyRepository Families => 
+            _familyRepository ??= new FamilyRepository(_context);
+
+        public IExpositionRepository Expositions => 
+            _expositionRepository ??= new ExpositionRepository(_context);
+
+        public IBiometryRepository Biometries => 
+            _biometryRepository ??= new BiometryRepository(_context);
+
+        public IPhenologyRepository Phenologies => 
+            _phenologyRepository ??= new PhenologyRepository(_context);
+
+        public IRegionRepository Regions => 
+            _regionRepository ??= new RegionRepository(_context);
+
+        public IUserRepository Users => 
+            _userRepository ??= new UserRepository(_context);
+            
+        public IMapRepository Maps => 
+            _mapRepository ??= new MapRepository(_context);
+            
+        public ISpecimenImageRepository SpecimenImages => 
+            _specimenImageRepository ??= new SpecimenImageRepository(
+                _context,
+                new Microsoft.Extensions.Logging.Abstractions.NullLogger<SpecimenImageRepository>());
 
         public async Task<int> SaveChangesAsync()
         {
