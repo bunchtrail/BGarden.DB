@@ -3,7 +3,11 @@ using Application.Mappers;
 using BGarden.Domain.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.IO; // Для Path
+using System.Linq; // Для Select и Any
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Application.Interfaces; // Для IFormFile
 
 namespace Application.UseCases
 {
@@ -13,87 +17,90 @@ namespace Application.UseCases
     public class CreateSpecimenWithImagesUseCase
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ISpecimenImageService _specimenImageService;
 
-        public CreateSpecimenWithImagesUseCase(IUnitOfWork unitOfWork)
+        public CreateSpecimenWithImagesUseCase(IUnitOfWork unitOfWork, ISpecimenImageService specimenImageService)
         {
-            _unitOfWork = unitOfWork;
+            _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+            _specimenImageService = specimenImageService ?? throw new ArgumentNullException(nameof(specimenImageService));
         }
 
         /// <summary>
-        /// Создает образец растения с прикрепленными изображениями в одной транзакции
+        /// Создает образец растения с прикрепленными изображениями в одной транзакции.
+        /// Файлы сохраняются в файловую систему (пока имитация).
         /// </summary>
         /// <param name="specimenDto">Данные образца растения</param>
-        /// <param name="images">Список изображений в бинарном формате</param>
+        /// <param name="imageFiles">Коллекция файлов изображений (IFormFile)</param>
         /// <returns>DTO созданного образца с идентификаторами прикрепленных изображений</returns>
         public async Task<(SpecimenDto Specimen, List<int> ImageIds)> ExecuteAsync(
-            SpecimenDto specimenDto, 
-            List<CreateSpecimenImageBinaryDto> images)
+            SpecimenDto specimenDto,
+            IEnumerable<IFormFile> imageFiles)
         {
-            // Проверка входных данных
             if (specimenDto == null)
                 throw new ArgumentNullException(nameof(specimenDto));
-            
-            if (images == null || images.Count == 0)
-                throw new ArgumentException("Необходимо предоставить хотя бы одно изображение");
+            if (imageFiles == null || !imageFiles.Any())
+                throw new ArgumentException("Необходимо предоставить хотя бы одно изображение.", nameof(imageFiles));
 
-            // Начинаем транзакцию
             await _unitOfWork.BeginTransactionAsync();
-            
             try
             {
-                // 1. Создаем образец
+                // 1. Создаем образец (Specimen)
                 var specimenEntity = specimenDto.ToEntity();
+                specimenEntity.CreatedAt = DateTime.UtcNow;
                 await _unitOfWork.Specimens.AddAsync(specimenEntity);
+                await _unitOfWork.SaveChangesAsync(); // Сохраняем образец, чтобы получить его ID
+
+                int specimenId = specimenEntity.Id;
+                var imageIds = new List<int>();
+                bool isFirstImage = true;
+
+                // 2. Сохраняем каждый файл и создаем для него запись SpecimenImage через сервис
+                foreach (var imageFile in imageFiles)
+                {
+                    if (imageFile == null || imageFile.Length == 0)
+                        continue;
+
+                    // Вызываем сервис для загрузки и добавления изображения
+                    // Сервис сам сохранит файл и создаст запись в БД (но без SaveChanges)
+                    var addedImageDto = await _specimenImageService.UploadAndAddImageAsync(
+                        specimenId,
+                        imageFile,
+                        description: $"Загружен: {Path.GetFileName(imageFile.FileName)}", // Используем Path.GetFileName
+                        isMain: isFirstImage
+                    );
+                    imageIds.Add(addedImageDto.Id);
+                    isFirstImage = false;
+                }
+                
+                // Все сущности SpecimenImage уже добавлены в контекст через _specimenImageService,
+                // который вызывает _unitOfWork.SpecimenImages.AddAsync().
+                // Теперь нужно сохранить эти изменения.
                 await _unitOfWork.SaveChangesAsync();
 
-                // 2. Получаем ID созданного образца
-                int specimenId = specimenEntity.Id;
-                
-                // 3. Обновляем SpecimenId во всех DTO изображений
-                foreach (var image in images)
-                {
-                    image.SpecimenId = specimenId;
-                }
-                
-                // 4. Добавляем изображения
-                var imageIds = new List<int>();
-                foreach (var imageDto in images)
-                {
-                    var imageEntity = imageDto.ToEntity();
-                    await _unitOfWork.SpecimenImages.AddAsync(imageEntity);
-                    await _unitOfWork.SaveChangesAsync();
-                    imageIds.Add(imageEntity.Id);
-                }
-                
-                // 5. Фиксируем транзакцию
                 await _unitOfWork.CommitTransactionAsync();
-                
-                // 6. Возвращаем DTO образца и список ID созданных изображений
-                return (specimenEntity.ToDto(), imageIds);
+
+                return (specimenEntity.ToDto(), imageIds); // Используем SpecimenMapper
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // В случае ошибки откатываем транзакцию
                 await _unitOfWork.RollbackTransactionAsync();
+                // TODO: Удалить физически сохраненные файлы, если транзакция БД не удалась.
+                // Это можно сделать, собирая пути к сохраненным файлам в цикле и удаляя их в catch.
+                Console.WriteLine($"[UseCase-Error] Ошибка при создании образца с изображениями: {ex.Message}. Начался откат.");
                 throw;
             }
         }
 
-        /// <summary>
-        /// Создает образец растения с одним прикрепленным изображением в одной транзакции
-        /// </summary>
-        /// <param name="specimenDto">Данные образца растения</param>
-        /// <param name="image">Изображение в бинарном формате</param>
-        /// <returns>DTO созданного образца с идентификатором прикрепленного изображения</returns>
+        // Перегрузка для одного изображения (для удобства)
         public async Task<(SpecimenDto Specimen, int ImageId)> ExecuteAsync(
-            SpecimenDto specimenDto, 
-            CreateSpecimenImageBinaryDto image)
+            SpecimenDto specimenDto,
+            IFormFile imageFile)
         {
-            if (image == null)
-                throw new ArgumentNullException(nameof(image));
+            if (imageFile == null)
+                throw new ArgumentNullException(nameof(imageFile));
 
-            var result = await ExecuteAsync(specimenDto, new List<CreateSpecimenImageBinaryDto> { image });
-            return (result.Specimen, result.ImageIds[0]);
+            var result = await ExecuteAsync(specimenDto, new List<IFormFile> { imageFile });
+            return (result.Specimen, result.ImageIds.FirstOrDefault());
         }
     }
 } 

@@ -86,5 +86,16 @@ namespace Application.DTO
         public string? Illustration { get; set; }
         public string? Notes { get; set; }
         public string? FilledBy { get; set; }
+
+        /// <summary>
+        /// Список изображений образца
+        /// </summary>
+        public List<SpecimenImageDto>? SpecimenImages { get; set; }
+
+        // Рекомендуется инициализировать список в конструкторе, чтобы избежать NullReferenceException
+        public SpecimenDto()
+        {
+            SpecimenImages = new List<SpecimenImageDto>();
+        }
     }
 } 

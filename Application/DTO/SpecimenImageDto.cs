@@ -16,9 +16,24 @@ namespace Application.DTO
         public int SpecimenId { get; set; }
         
         /// <summary>
-        /// Данные изображения в формате Base64
+        /// URL для доступа к изображению. Формируется на стороне API.
         /// </summary>
-        public string? ImageDataBase64 { get; set; }
+        public string? ImageUrl { get; set; }
+        
+        /// <summary>
+        /// Относительный путь к файлу (для внутреннего использования или отладки)
+        /// </summary>
+        public string? RelativeFilePath { get; set; }
+        
+        /// <summary>
+        /// Исходное имя файла
+        /// </summary>
+        public string? OriginalFileName { get; set; }
+        
+        /// <summary>
+        /// Размер файла в байтах
+        /// </summary>
+        public long? FileSize { get; set; }
         
         /// <summary>
         /// Тип содержимого (MIME-тип)
@@ -52,9 +67,19 @@ namespace Application.DTO
         public int SpecimenId { get; set; }
         
         /// <summary>
-        /// Данные изображения в формате Base64
+        /// Относительный путь к сохраненному файлу. Заполняется сервисом.
         /// </summary>
-        public string ImageDataBase64 { get; set; } = null!;
+        public string FilePath { get; set; } = null!;
+        
+        /// <summary>
+        /// Исходное имя файла (опционально)
+        /// </summary>
+        public string? OriginalFileName { get; set; }
+        
+        /// <summary>
+        /// Размер файла в байтах (опционально)
+        /// </summary>
+        public long? FileSize { get; set; }
         
         /// <summary>
         /// Тип содержимого (MIME-тип)
@@ -85,6 +110,6 @@ namespace Application.DTO
         /// <summary>
         /// Флаг, указывающий, является ли изображение основным
         /// </summary>
-        public bool IsMain { get; set; }
+        public bool? IsMain { get; set; }
     }
 } 

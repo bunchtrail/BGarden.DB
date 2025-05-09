@@ -5,6 +5,8 @@ using BGarden.Domain.Entities;
 using BGarden.Domain.Interfaces;
 using BGarden.Domain.Enums;
 using NetTopologySuite.Geometries;
+using Domain.Entities;
+using Microsoft.AspNetCore.Http;
 
 namespace Application.Services
 {
@@ -15,29 +17,55 @@ namespace Application.Services
     public class SpecimenService : ISpecimenService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public SpecimenService(IUnitOfWork unitOfWork)
+        public SpecimenService(IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor)
         {
             _unitOfWork = unitOfWork;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<IEnumerable<SpecimenDto>> GetAllSpecimensAsync()
         {
             var specimens = await _unitOfWork.Specimens.GetAllAsync();
-            return specimens.Select(s => s.ToDto()).ToList();
+            var specimenDtos = new List<SpecimenDto>();
+
+            foreach (var specimen in specimens)
+            {
+                var dto = specimen.ToDto();
+                await AddMainImageToDto(dto, specimen.Id);
+                specimenDtos.Add(dto);
+            }
+
+            return specimenDtos;
         }
 
         public async Task<SpecimenDto?> GetSpecimenByIdAsync(int id)
         {
             var specimen = await _unitOfWork.Specimens.GetByIdAsync(id);
-            return specimen?.ToDto();
+            if (specimen == null)
+                return null;
+            
+            var dto = specimen.ToDto();
+            await AddMainImageToDto(dto, specimen.Id);
+            
+            return dto;
         }
 
         public async Task<IEnumerable<SpecimenDto>> GetFilteredSpecimensAsync(string? name = null, int? familyId = null, int? regionId = null)
         {
             // Используем специализированный метод репозитория для получения отфильтрованных образцов
             var specimens = await _unitOfWork.Specimens.GetFilteredSpecimensAsync(name, familyId, regionId);
-            return specimens.Select(s => s.ToDto()).ToList();
+            var specimenDtos = new List<SpecimenDto>();
+
+            foreach (var specimen in specimens)
+            {
+                var dto = specimen.ToDto();
+                await AddMainImageToDto(dto, specimen.Id);
+                specimenDtos.Add(dto);
+            }
+
+            return specimenDtos;
         }
 
         public async Task<SpecimenDto> CreateSpecimenAsync(SpecimenDto specimenDto)
@@ -86,7 +114,16 @@ namespace Application.Services
         public async Task<IEnumerable<SpecimenDto>> GetSpecimensBySectorTypeAsync(SectorType sectorType)
         {
             var specimens = await _unitOfWork.Specimens.GetSpecimensBySectorTypeAsync(sectorType);
-            return specimens.Select(s => s.ToDto()).ToList();
+            var specimenDtos = new List<SpecimenDto>();
+
+            foreach (var specimen in specimens)
+            {
+                var dto = specimen.ToDto();
+                await AddMainImageToDto(dto, specimen.Id);
+                specimenDtos.Add(dto);
+            }
+
+            return specimenDtos;
         }
         
         public async Task<IEnumerable<SpecimenDto>> GetSpecimensInBoundingBoxAsync(decimal minLat, decimal minLng, decimal maxLat, decimal maxLng)
@@ -100,7 +137,16 @@ namespace Application.Services
             );
             
             var specimens = await _unitOfWork.Specimens.GetSpecimensInBoundingBoxAsync(boundingBox);
-            return specimens.Select(s => s.ToDto()).ToList();
+            var specimenDtos = new List<SpecimenDto>();
+
+            foreach (var specimen in specimens)
+            {
+                var dto = specimen.ToDto();
+                await AddMainImageToDto(dto, specimen.Id);
+                specimenDtos.Add(dto);
+            }
+
+            return specimenDtos;
         }
         
         public async Task<SpecimenDto> AddSpecimenToMapAsync(SpecimenDto specimenDto)
@@ -163,6 +209,38 @@ namespace Application.Services
             await _unitOfWork.SaveChangesAsync();
             
             return existing.ToDto();
+        }
+
+        /// <summary>
+        /// Добавляет основное изображение к DTO образца
+        /// </summary>
+        /// <param name="dto">DTO образца</param>
+        /// <param name="specimenId">Идентификатор образца</param>
+        private async Task AddMainImageToDto(SpecimenDto dto, int specimenId)
+        {
+            var mainImageDomain = await _unitOfWork.SpecimenImages.GetMainImageBySpecimenIdAsync(specimenId);
+
+            if (mainImageDomain != null)
+            {
+                var mainImageDto = mainImageDomain.ToDto();
+
+                if (!string.IsNullOrEmpty(mainImageDto.RelativeFilePath))
+                {
+                    var request = _httpContextAccessor.HttpContext?.Request;
+                    if (request != null)
+                    {
+                        mainImageDto.ImageUrl = $"{request.Scheme}://{request.Host}{request.PathBase}/{mainImageDto.RelativeFilePath.TrimStart('/', '\\')}";
+                    }
+                    else
+                    {
+                        mainImageDto.ImageUrl = mainImageDto.RelativeFilePath;
+                    }
+                }
+
+                // ГАРАНТИРУЕМ, что список инициализирован
+                dto.SpecimenImages ??= new List<SpecimenImageDto>();
+                dto.SpecimenImages.Add(mainImageDto);
+            }
         }
     }
 } 

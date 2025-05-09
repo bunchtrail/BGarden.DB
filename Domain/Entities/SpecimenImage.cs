@@ -23,9 +23,20 @@ namespace Domain.Entities
         public Specimen Specimen { get; set; } = null!;
         
         /// <summary>
-        /// Данные изображения в бинарном формате
+        /// Относительный путь к файлу изображения в файловой системе.
+        /// Например: "/specimen-images/00001/image_abc.jpg"
         /// </summary>
-        public byte[] ImageData { get; set; } = null!;
+        public string FilePath { get; set; } = null!;
+        
+        /// <summary>
+        /// Исходное имя файла (опционально, для информации)
+        /// </summary>
+        public string? OriginalFileName { get; set; }
+        
+        /// <summary>
+        /// Размер файла в байтах (опционально, для информации)
+        /// </summary>
+        public long? FileSize { get; set; }
         
         /// <summary>
         /// Тип содержимого (MIME-тип)

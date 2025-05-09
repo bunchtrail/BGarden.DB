@@ -15,9 +15,14 @@ namespace Infrastructure.Data.Configurations
             
             builder.HasKey(si => si.Id);
             
-            builder.Property(si => si.ImageData)
+            builder.Property(si => si.FilePath)
                 .IsRequired()
-                .HasColumnType("bytea");
+                .HasMaxLength(1024);
+                
+            builder.Property(si => si.OriginalFileName)
+                .HasMaxLength(255);
+                
+            builder.Property(si => si.FileSize);
                 
             builder.Property(si => si.ContentType)
                 .IsRequired()

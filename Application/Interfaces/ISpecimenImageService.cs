@@ -1,4 +1,7 @@
 using Application.DTO;
+using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Application.Interfaces
 {
@@ -51,6 +54,16 @@ namespace Application.Interfaces
         /// <param name="dtos">Коллекция DTO создания изображений</param>
         /// <returns>Коллекция DTO добавленных изображений</returns>
         Task<IEnumerable<SpecimenImageDto>> AddMultipleAsync(IEnumerable<CreateSpecimenImageBinaryDto> dtos);
+        
+        /// <summary>
+        /// Загрузить и добавить новое изображение
+        /// </summary>
+        /// <param name="specimenId">Идентификатор образца</param>
+        /// <param name="imageFile">Файл изображения</param>
+        /// <param name="description">Описание изображения</param>
+        /// <param name="isMain">Является ли изображение основным</param>
+        /// <returns>DTO добавленного изображения</returns>
+        Task<SpecimenImageDto> UploadAndAddImageAsync(int specimenId, IFormFile imageFile, string? description, bool isMain);
         
         /// <summary>
         /// Обновить существующее изображение

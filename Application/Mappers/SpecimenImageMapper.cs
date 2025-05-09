@@ -14,24 +14,22 @@ namespace Application.Mappers
         /// Конвертирует модель SpecimenImage в DTO
         /// </summary>
         /// <param name="image">Модель изображения</param>
-        /// <param name="includeImageData">Флаг, указывающий, нужно ли включать данные изображения</param>
+        /// <param name="baseApiUrl">Базовый URL для формирования ImageUrl</param>
         /// <returns>DTO изображения</returns>
-        public static SpecimenImageDto ToDto(this SpecimenImage image, bool includeImageData = true)
+        public static SpecimenImageDto ToDto(this SpecimenImage image, string baseApiUrl = "")
         {
             var dto = new SpecimenImageDto
             {
                 Id = image.Id,
                 SpecimenId = image.SpecimenId,
+                RelativeFilePath = image.FilePath,
+                OriginalFileName = image.OriginalFileName,
+                FileSize = image.FileSize,
                 ContentType = image.ContentType,
                 Description = image.Description,
                 IsMain = image.IsMain,
                 UploadedAt = image.UploadedAt
             };
-            
-            if (includeImageData && image.ImageData != null)
-            {
-                dto.ImageDataBase64 = Convert.ToBase64String(image.ImageData);
-            }
             
             return dto;
         }
@@ -43,30 +41,12 @@ namespace Application.Mappers
         /// <returns>Модель изображения</returns>
         public static SpecimenImage ToEntity(this CreateSpecimenImageDto dto)
         {
-            byte[] imageData = Convert.FromBase64String(dto.ImageDataBase64);
-            
             return new SpecimenImage
             {
                 SpecimenId = dto.SpecimenId,
-                ImageData = imageData,
-                ContentType = dto.ContentType,
-                Description = dto.Description,
-                IsMain = dto.IsMain,
-                UploadedAt = DateTime.UtcNow
-            };
-        }
-        
-        /// <summary>
-        /// Конвертирует DTO создания изображения с бинарными данными в модель
-        /// </summary>
-        /// <param name="dto">DTO создания изображения с бинарными данными</param>
-        /// <returns>Модель изображения</returns>
-        public static SpecimenImage ToEntity(this CreateSpecimenImageBinaryDto dto)
-        {
-            return new SpecimenImage
-            {
-                SpecimenId = dto.SpecimenId,
-                ImageData = dto.ImageData,
+                FilePath = dto.FilePath,
+                OriginalFileName = dto.OriginalFileName,
+                FileSize = dto.FileSize,
                 ContentType = dto.ContentType,
                 Description = dto.Description,
                 IsMain = dto.IsMain,
@@ -82,9 +62,15 @@ namespace Application.Mappers
         /// <returns>Обновленная модель изображения</returns>
         public static SpecimenImage ApplyUpdate(this SpecimenImage entity, UpdateSpecimenImageDto dto)
         {
-            entity.Description = dto.Description;
-            entity.IsMain = dto.IsMain;
-            
+            if (dto.Description != null)
+            {
+                entity.Description = dto.Description;
+            }
+            if (dto.IsMain.HasValue)
+            {
+                entity.IsMain = dto.IsMain.Value;
+            }
+
             return entity;
         }
     }

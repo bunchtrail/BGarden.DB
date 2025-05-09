@@ -57,7 +57,8 @@ namespace Application.Mappers
                 Country = entity.Country,
                 Illustration = entity.Illustration,
                 Notes = entity.Notes,
-                FilledBy = entity.FilledBy
+                FilledBy = entity.FilledBy,
+                SpecimenImages = new List<SpecimenImageDto>()
             };
 
             // Если у нас есть пространственные данные, преобразуем их в WKT
